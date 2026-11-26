@@ -1,0 +1,53 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="Game.uss" />
+    <ui:VisualElement name="settings-overlay" class="overlay">
+        <ui:VisualElement class="settings">
+            <ui:Label text="SETTINGS" class="settings__title" picking-mode="Ignore" />
+
+            <ui:VisualElement class="setting-row">
+                <ui:Label text="LOOK SENSITIVITY" class="setting-row__label" picking-mode="Ignore" />
+                <ui:Slider name="look" low-value="0.2" high-value="3" class="setting-slider" />
+                <ui:Label name="look-value" class="setting-row__value" picking-mode="Ignore" />
+            </ui:VisualElement>
+
+            <ui:VisualElement class="setting-row">
+                <ui:Label text="SCOPE SENSITIVITY" class="setting-row__label" picking-mode="Ignore" />
+                <ui:Slider name="scope" low-value="0.1" high-value="1" class="setting-slider" />
+                <ui:Label name="scope-value" class="setting-row__value" picking-mode="Ignore" />
+            </ui:VisualElement>
+
+            <ui:VisualElement class="setting-row">
+                <ui:Label text="MASTER VOLUME" class="setting-row__label" picking-mode="Ignore" />
+                <ui:Slider name="volume" low-value="0" high-value="1" class="setting-slider" />
+                <ui:Label name="volume-value" class="setting-row__value" picking-mode="Ignore" />
+            </ui:VisualElement>
+
+            <ui:VisualElement class="setting-row">
+                <ui:Label text="GRAPHICS" class="setting-row__label" picking-mode="Ignore" />
+                <ui:Button name="quality" class="btn setting-cycle" />
+            </ui:VisualElement>
+
+            <ui:VisualElement class="setting-row">
+                <ui:Label text="60 FPS  (OFF = BATTERY SAVER)" class="setting-row__label" picking-mode="Ignore" />
+                <ui:Toggle name="fps60" class="setting-toggle" />
+            </ui:VisualElement>
+
+            <ui:VisualElement class="setting-row">
+                <ui:Label text="VIBRATION" class="setting-row__label" picking-mode="Ignore" />
+                <ui:Toggle name="vibration" class="setting-toggle" />
+            </ui:VisualElement>
+
+            <ui:VisualElement class="setting-row">
+                <ui:Label text="SHOW FPS" class="setting-row__label" picking-mode="Ignore" />
+                <ui:Toggle name="showfps" class="setting-toggle" />
+            </ui:VisualElement>
+
+            <ui:VisualElement name="region-row" class="setting-row">
+                <ui:Label text="SERVER REGION" class="setting-row__label" picking-mode="Ignore" />
+                <ui:Button name="region" class="btn setting-cycle" />
+            </ui:VisualElement>
+
+            <ui:Button name="done" text="DONE" class="btn btn--primary settings__done" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

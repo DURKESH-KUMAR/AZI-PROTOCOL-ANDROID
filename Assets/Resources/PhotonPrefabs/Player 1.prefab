@@ -981,7 +981,7 @@ MonoBehaviour:
   maxPivotAngle: 30
   collisionLayer:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 72705
   cameraCollisionOffset: 0.2
   minCollisionOffset: 0.2
   cameraCollisionRadius: 0.2
@@ -1666,7 +1666,7 @@ MonoBehaviour:
   rayCastHeightOffset: 0.5
   groundLayer:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 72705
   isMoving: 0
   isSprinting: 0
   isGrounded: 0

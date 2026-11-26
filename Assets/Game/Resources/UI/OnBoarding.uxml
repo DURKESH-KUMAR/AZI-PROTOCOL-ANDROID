@@ -1,0 +1,55 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="Game.uss" />
+    <Style src="OnBoarding.uss" />
+    <ui:VisualElement name="onboarding" class="fill" picking-mode="Ignore">
+        <ui:VisualElement name="art" class="art" picking-mode="Ignore" />
+        <ui:VisualElement name="shade" class="shade" picking-mode="Ignore" />
+
+        <ui:VisualElement name="briefing" class="briefing" picking-mode="Ignore">
+            <!-- top: brand + room -->
+            <ui:VisualElement class="topbar" picking-mode="Ignore">
+                <ui:VisualElement class="brand" picking-mode="Ignore">
+                    <ui:VisualElement class="brand__bar" picking-mode="Ignore" />
+                    <ui:Label text="PHANTOM" class="brand__name" picking-mode="Ignore" />
+                    <ui:Label text="WARRIOR" class="brand__name brand__name--accent" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:VisualElement name="room-chip" class="room-chip" picking-mode="Ignore">
+                    <ui:Label text="ROOM" class="room-chip__label" picking-mode="Ignore" />
+                    <ui:Label name="room-name" class="room-chip__value" picking-mode="Ignore" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- bottom: briefing + progress -->
+            <ui:VisualElement class="bottom" picking-mode="Ignore">
+                <ui:Label text="MISSION BRIEFING" class="kicker" picking-mode="Ignore" />
+                <ui:Label name="headline" text="DEPLOYING" class="headline" picking-mode="Ignore" />
+                <ui:Label name="caption" class="caption" picking-mode="Ignore" />
+
+                <ui:VisualElement class="info-row" picking-mode="Ignore">
+                    <ui:VisualElement name="team-card" class="team-card" picking-mode="Ignore">
+                        <ui:Label text="YOUR TEAM" class="team-card__label" picking-mode="Ignore" />
+                        <ui:Label name="team-name" text="-" class="team-card__value" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="versus" class="versus" picking-mode="Ignore">
+                        <ui:Label name="blue-count" text="0" class="versus__blue" picking-mode="Ignore" />
+                        <ui:Label text="VS" class="versus__vs" picking-mode="Ignore" />
+                        <ui:Label name="red-count" text="0" class="versus__red" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tip" picking-mode="Ignore">
+                        <ui:Label text="TIP" class="tip__label" picking-mode="Ignore" />
+                        <ui:Label name="tip" class="tip__text" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <ui:VisualElement class="progress-row" picking-mode="Ignore">
+                    <ui:Label name="progress-label" text="LOADING" class="progress-label" picking-mode="Ignore" />
+                    <ui:VisualElement name="progress" class="progress" picking-mode="Ignore">
+                        <ui:VisualElement name="progress-fill" class="progress__fill" picking-mode="Ignore" />
+                        <ui:VisualElement name="progress-sweep" class="progress__sweep" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:Label name="progress-percent" text="0%" class="progress-percent" picking-mode="Ignore" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

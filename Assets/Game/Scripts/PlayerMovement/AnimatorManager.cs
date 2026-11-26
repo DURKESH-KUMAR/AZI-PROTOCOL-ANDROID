@@ -39,7 +39,13 @@ public class AnimatorManager : MonoBehaviour
 
     public void PlayTargetAnim(string targetAnim, bool isInteracting)
     {
+        PlayTargetAnim(Animator.StringToHash(targetAnim), isInteracting);
+    }
+
+    /// <summary>Hash overload: use with cached Animator.StringToHash values to avoid per-call hashing.</summary>
+    public void PlayTargetAnim(int targetAnimHash, bool isInteracting)
+    {
         animator.SetBool(IsInteractingHash, isInteracting);
-        animator.CrossFade(targetAnim, 0.2f);
+        animator.CrossFade(targetAnimHash, 0.2f);
     }
 }

@@ -35,12 +35,26 @@ public class PlayerManager : MonoBehaviour
             Destroy(cameraManager.gameObject);
             cameraManager = null;
         }
+
+        // Remote copies are driven by the network: skip Update/FixedUpdate/LateUpdate entirely.
+        if (!view.IsMine)
+            enabled = false;
+        else
+            PlayerControlsUI.Attach(gameObject); // UI Toolkit touch controls replace the prefab's uGUI canvas
     }
+
+    /// <summary>Set by the pause menu: the match keeps running (multiplayer), but this player stops acting.</summary>
+    public static bool InputBlocked;
 
     void Update()
     {
-        if (!view.IsMine)
+        if (!view.IsMine || playerMovement.IsDead)
             return;
+        if (InputBlocked)
+        {
+            inputManager.ClearInputs();
+            return;
+        }
         inputManager.HandleAllInputs();
     }
 
@@ -48,12 +62,13 @@ public class PlayerManager : MonoBehaviour
     {
         if (!view.IsMine)
             return;
+        // With inputs cleared (pause/death) movement resolves to standing still.
         playerMovement.HandleAllMovement();
     }
 
     void LateUpdate()
     {
-        if (!view.IsMine)
+        if (!view.IsMine || playerMovement.IsDead)
             return;
         if (cameraManager != null)
             cameraManager.HandleAllCameraMovement();

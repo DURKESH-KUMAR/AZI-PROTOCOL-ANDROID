@@ -1,0 +1,136 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="Game.uss" />
+    <Style src="MainMenu.uss" />
+    <ui:VisualElement name="menu" class="menu" picking-mode="Ignore">
+        <ui:VisualElement name="shade" class="menu__shade" picking-mode="Ignore" />
+
+        <!-- LoadingMenu -->
+        <ui:VisualElement name="screen-loading" class="screen hidden" picking-mode="Ignore">
+            <ui:VisualElement class="center" picking-mode="Ignore">
+                <ui:VisualElement name="spinner" class="spinner" picking-mode="Ignore" />
+                <ui:Label name="loading-text" text="CONNECTING" class="loading__text" picking-mode="Ignore" />
+                <ui:Label name="loading-sub" text="Finding the best server..." class="loading__sub" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- UserNameMenu -->
+        <ui:VisualElement name="screen-username" class="screen hidden" picking-mode="Ignore">
+            <ui:VisualElement class="column" picking-mode="Ignore">
+                <ui:VisualElement class="card">
+                    <ui:Label text="CALLSIGN" class="card__title" picking-mode="Ignore" />
+                    <ui:Label text="Choose the name other players will see (max 20 characters)." class="card__hint" picking-mode="Ignore" />
+                    <ui:TextField name="username-field" max-length="20" class="field" />
+                    <ui:Label name="username-error" class="card__error" picking-mode="Ignore" />
+                    <ui:VisualElement class="card__row" picking-mode="Ignore">
+                        <ui:VisualElement picking-mode="Ignore" />
+                        <ui:Button name="username-next" text="NEXT" class="btn btn--primary" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- TitleMenu -->
+        <ui:VisualElement name="screen-title" class="screen hidden" picking-mode="Ignore">
+            <ui:VisualElement class="column" picking-mode="Ignore">
+                <ui:VisualElement name="logo" class="logo-block" picking-mode="Ignore">
+                    <ui:Label text="PHANTOM" class="logo" picking-mode="Ignore" />
+                    <ui:Label text="WARRIOR" class="logo logo--accent" picking-mode="Ignore" />
+                    <ui:VisualElement class="logo__bar" picking-mode="Ignore" />
+                    <ui:Label text="TACTICAL TEAM SHOOTER" class="tagline" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-direction: row; align-items: center;" picking-mode="Ignore">
+                    <ui:Label name="welcome" class="welcome" picking-mode="Ignore" />
+                    <ui:Button name="change-name" text="CHANGE" class="link" style="margin-bottom: 26px;" />
+                </ui:VisualElement>
+                <ui:Button name="title-find" text="FIND ROOM" class="btn menu-btn stagger" />
+                <ui:Button name="title-create" text="CREATE ROOM" class="btn menu-btn stagger" />
+                <ui:Button name="title-settings" text="SETTINGS" class="btn menu-btn menu-btn--quiet stagger" />
+                <ui:Button name="title-quit" text="QUIT" class="btn menu-btn menu-btn--quiet stagger" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- CreateRoomMenu -->
+        <ui:VisualElement name="screen-create" class="screen hidden" picking-mode="Ignore">
+            <ui:VisualElement class="column" picking-mode="Ignore">
+                <ui:VisualElement class="card">
+                    <ui:Label text="CREATE ROOM" class="card__title" picking-mode="Ignore" />
+                    <ui:Label name="create-hint" text="Players join by picking your room from Find Room." class="card__hint" picking-mode="Ignore" />
+                    <ui:TextField name="room-field" max-length="24" class="field" />
+                    <ui:Label name="create-error" class="card__error" picking-mode="Ignore" />
+                    <ui:VisualElement class="card__row" picking-mode="Ignore">
+                        <ui:Button name="create-back" text="BACK" class="btn" />
+                        <ui:Button name="create-confirm" text="CREATE" class="btn btn--primary" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- FindRoomMenu -->
+        <ui:VisualElement name="screen-find" class="screen hidden" picking-mode="Ignore">
+            <ui:VisualElement class="column" picking-mode="Ignore">
+                <ui:VisualElement class="card">
+                    <ui:Label text="AVAILABLE ROOMS" class="card__title" picking-mode="Ignore" />
+                    <ui:Label name="find-hint" text="Rooms update live." class="card__hint" picking-mode="Ignore" />
+                    <ui:ScrollView name="room-list" mode="Vertical" class="list" />
+                    <ui:Label name="room-empty" text="No open rooms right now.&#10;Create one and invite your squad." class="empty hidden" picking-mode="Ignore" />
+                    <ui:VisualElement class="card__row" picking-mode="Ignore">
+                        <ui:Button name="find-back" text="BACK" class="btn" />
+                        <ui:Button name="find-create" text="CREATE ROOM" class="btn btn--primary" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- RoomMenu (lobby) -->
+        <ui:VisualElement name="screen-room" class="screen hidden" picking-mode="Ignore">
+            <ui:VisualElement class="lobby" picking-mode="Ignore">
+                <ui:VisualElement class="lobby__header" picking-mode="Ignore">
+                    <ui:Label name="lobby-name" class="lobby__name" picking-mode="Ignore" />
+                    <ui:Label name="lobby-count" class="lobby__count" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:VisualElement class="lobby__progress" picking-mode="Ignore">
+                    <ui:VisualElement name="lobby-progress" class="lobby__progress-fill" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:VisualElement class="teams" picking-mode="Ignore">
+                    <ui:VisualElement class="team team--blue" picking-mode="Ignore">
+                        <ui:Label text="BLUE TEAM" class="team__title" picking-mode="Ignore" />
+                        <ui:VisualElement name="team-blue" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="team team--red" picking-mode="Ignore">
+                        <ui:Label text="RED TEAM" class="team__title" picking-mode="Ignore" />
+                        <ui:VisualElement name="team-red" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="lobby__footer" picking-mode="Ignore">
+                    <ui:Button name="lobby-leave" text="LEAVE ROOM" class="btn btn--danger" />
+                    <ui:Label name="lobby-status" class="lobby__status" picking-mode="Ignore" />
+                    <ui:Button name="lobby-switch" text="SWITCH TEAM" class="btn" style="margin-right: 20px;" />
+                    <ui:Button name="lobby-main" text="READY" class="btn btn--primary" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- ErrorMenu -->
+        <ui:VisualElement name="screen-error" class="screen hidden" picking-mode="Ignore">
+            <ui:VisualElement class="center" picking-mode="Ignore">
+                <ui:VisualElement class="card" style="border-top-color: rgb(255, 82, 77);">
+                    <ui:Label text="SOMETHING WENT WRONG" class="card__title" picking-mode="Ignore" />
+                    <ui:Label name="error-text" class="card__hint" picking-mode="Ignore" />
+                    <ui:VisualElement class="card__row" picking-mode="Ignore">
+                        <ui:VisualElement picking-mode="Ignore" />
+                        <ui:Button name="error-ok" text="OK" class="btn btn--primary" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- connection status -->
+        <ui:VisualElement class="status" picking-mode="Ignore">
+            <ui:VisualElement name="status-dot" class="status__dot" picking-mode="Ignore" />
+            <ui:Label name="status-text" class="status__text" picking-mode="Ignore" />
+        </ui:VisualElement>
+
+        <ui:Label name="version" class="version" picking-mode="Ignore" />
+        <ui:VisualElement name="settings-host" class="fill" picking-mode="Ignore" />
+    </ui:VisualElement>
+</ui:UXML>

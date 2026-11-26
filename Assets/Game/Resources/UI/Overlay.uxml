@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="Game.uss" />
+    <ui:VisualElement name="overlay-root" class="fill" picking-mode="Ignore">
+        <ui:Label name="toast" class="toast" picking-mode="Ignore" />
+        <ui:Label name="fps" class="fps hidden" picking-mode="Ignore" />
+    </ui:VisualElement>
+</ui:UXML>

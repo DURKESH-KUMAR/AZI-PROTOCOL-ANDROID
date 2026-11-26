@@ -1,0 +1,72 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="Game.uss" />
+    <Style src="HUD.uss" />
+    <ui:VisualElement name="hud" class="fill" picking-mode="Ignore">
+
+        <!-- full-screen feedback -->
+        <ui:VisualElement name="low-health" class="vignette" picking-mode="Ignore" />
+        <ui:VisualElement name="damage-flash" class="vignette" picking-mode="Ignore" />
+        <ui:VisualElement name="damage-arrow" class="damage-arrow" picking-mode="Ignore" />
+
+        <!-- crosshair feedback -->
+        <ui:VisualElement name="hitmarker" class="hitmarker" picking-mode="Ignore">
+            <ui:VisualElement name="hit-0" class="hitmarker__line" picking-mode="Ignore" />
+            <ui:VisualElement name="hit-1" class="hitmarker__line" picking-mode="Ignore" />
+            <ui:VisualElement name="hit-2" class="hitmarker__line" picking-mode="Ignore" />
+            <ui:VisualElement name="hit-3" class="hitmarker__line" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:Label name="spawn" class="spawn" picking-mode="Ignore" />
+
+        <!-- messages -->
+        <ui:VisualElement name="callout" class="callout" picking-mode="Ignore">
+            <ui:Label name="callout-title" class="callout__title" picking-mode="Ignore" />
+            <ui:Label name="callout-sub" class="callout__sub" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:Label name="warmup" class="warmup" picking-mode="Ignore" />
+
+        <!-- weapon -->
+        <ui:VisualElement name="ammo" class="ammo panel" picking-mode="Ignore">
+            <ui:Label name="ammo-count" class="ammo__count" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:VisualElement name="reload" class="reload hidden" picking-mode="Ignore">
+            <ui:Label name="reload-label" text="RELOADING" class="reload__label" picking-mode="Ignore" />
+            <ui:VisualElement class="reload__track" picking-mode="Ignore">
+                <ui:VisualElement name="reload-fill" class="reload__fill" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- world awareness -->
+        <ui:VisualElement name="killfeed" class="killfeed" picking-mode="Ignore" />
+        <ui:VisualElement name="radar" class="radar" picking-mode="Ignore">
+            <ui:VisualElement class="radar__line-h" picking-mode="Ignore" />
+            <ui:VisualElement class="radar__line-v" picking-mode="Ignore" />
+            <ui:VisualElement name="radar-dots" class="fill" picking-mode="Ignore" />
+            <ui:VisualElement class="radar__self-dir" picking-mode="Ignore" />
+            <ui:VisualElement class="radar__self" picking-mode="Ignore" />
+        </ui:VisualElement>
+
+        <ui:Button name="pause-button" text="II" class="btn pause-button" />
+
+        <!-- states -->
+        <ui:VisualElement name="death" class="death hidden" picking-mode="Ignore">
+            <ui:Label name="death-title" class="death__title" picking-mode="Ignore" />
+            <ui:Label name="death-timer" class="death__timer" picking-mode="Ignore" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="banner" class="banner" picking-mode="Ignore">
+            <ui:Label name="banner-title" class="banner__title" picking-mode="Ignore" />
+            <ui:Label name="banner-sub" class="banner__sub" picking-mode="Ignore" />
+        </ui:VisualElement>
+
+        <!-- pause menu (blocks touches while open) -->
+        <ui:VisualElement name="pause" class="overlay hidden">
+            <ui:Label text="PAUSED" class="title" picking-mode="Ignore" />
+            <ui:Label text="The match keeps running while you are here." class="pause__hint" picking-mode="Ignore" />
+            <ui:Button name="resume" text="RESUME" class="btn" />
+            <ui:Button name="settings" text="SETTINGS" class="btn" />
+            <ui:Button name="leave" text="LEAVE MATCH" class="btn btn--danger" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="settings-host" class="fill" picking-mode="Ignore" />
+    </ui:VisualElement>
+</ui:UXML>

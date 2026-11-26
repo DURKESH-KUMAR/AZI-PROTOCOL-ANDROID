@@ -12,6 +12,13 @@ public class InputManager : MonoBehaviour
     public FixedJoystick movementJoystick;     // Joystick for movement
     public FixedJoystick cameraJoystick;       // Joystick for camera control
 
+    /// <summary>
+    /// UI Toolkit sticks (PlayerControlsUI). When set they replace the uGUI FixedJoysticks,
+    /// which belong to the old canvas that is disabled for the local player.
+    /// </summary>
+    public IStickInput moveStick;
+    public IStickInput lookStick;
+
     [Header("Movement Values")]
     public float verticalInput;
     public float horizontalInput;
@@ -47,7 +54,13 @@ public class InputManager : MonoBehaviour
 
     private void HandleMovementInput()
     {
-        if (movementJoystick != null)
+        if (moveStick != null)
+        {
+            Vector2 v = moveStick.Value;
+            horizontalInput = v.x;
+            verticalInput = v.y;
+        }
+        else if (movementJoystick != null)
         {
             horizontalInput = movementJoystick.Horizontal;
             verticalInput = movementJoystick.Vertical;
@@ -79,13 +92,33 @@ public class InputManager : MonoBehaviour
 
     private void HandleCameraInput()
     {
-        if (cameraJoystick == null)
+        if (lookStick == null && cameraJoystick == null)
         {
             cameraInputX = cameraInputY = 0f;
             return;
         }
-        cameraInputX = cameraJoystick.Horizontal * lookSensitivity;
-        cameraInputY = cameraJoystick.Vertical * lookSensitivity;
+        // Player-chosen sensitivity, reduced while scoped so zoomed aim isn't twitchy.
+        float sensitivity = lookSensitivity * GameSettings.LookSensitivity;
+        if (scopeInput)
+            sensitivity *= GameSettings.ScopeSensitivity;
+        Vector2 look = lookStick != null ? lookStick.Value : new Vector2(cameraJoystick.Horizontal, cameraJoystick.Vertical);
+        cameraInputX = look.x * sensitivity;
+        cameraInputY = look.y * sensitivity;
+    }
+
+    /// <summary>Drop all held inputs (death, pause menu) so nothing stays "pressed".</summary>
+    public void ClearInputs()
+    {
+        verticalInput = horizontalInput = movementAmount = 0f;
+        cameraInputX = cameraInputY = 0f;
+        sprintInput = jumpInput = fireInput = reloadInput = scopeInput = false;
+        if (playerMovement != null)
+        {
+            playerMovement.isSprinting = false;
+            playerMovement.isMoving = false;
+        }
+        if (animatorManager != null)
+            animatorManager.ChangeAnimatorValues(0f, 0f, false);
     }
 
     /// <summary>Reload is a one-shot press: returns true once, then clears the flag.</summary>
@@ -107,6 +140,7 @@ public class InputManager : MonoBehaviour
 
     public void OnScopePressed()  => scopeInput = true;
     public void OnScopeReleased() => scopeInput = false;
+    public void ToggleScope() => scopeInput = !scopeInput;
 
     public void OnSprintPressed()  => sprintInput = true;
     public void OnSprintReleased() => sprintInput = false;

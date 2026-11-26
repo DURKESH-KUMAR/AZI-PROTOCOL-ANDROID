@@ -43,6 +43,9 @@ MonoBehaviour:
   - RPC_Shoot
   - UpdateScores
   - RPC_ReportDeath
+  - RPC_KillFeed
+  - RPC_OnDied
+  - RPC_SyncHealth
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

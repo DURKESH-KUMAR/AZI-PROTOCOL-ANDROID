@@ -31282,7 +31282,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0d3e9636d6ceb447bed066a8f348a8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  IsMenuOpened: 0
 --- !u!4 &784178202
 Transform:
   m_ObjectHideFlags: 0
@@ -35579,6 +35578,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TimerScript
   timeRemaining: 600
   timerText: {fileID: 261283955}
+  warmupSeconds: 5
+  warningColor: {r: 1, g: 0.35, b: 0.3, a: 1}
+  warningSeconds: 30
 --- !u!114 &886938530
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35595,6 +35597,8 @@ MonoBehaviour:
   redTeamText: {fileID: 982265673}
   blueTeamScore: 0
   redTeamScore: 0
+  scoreLimit: 25
+  endBannerTime: 4
 --- !u!114 &886938531
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -43552,7 +43556,7 @@ Transform:
   m_GameObject: {fileID: 1075140633}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.74831694, z: -0, w: 0.6633414}
-  m_LocalPosition: {x: -66.74091, y: 4.94, z: 22.4}
+  m_LocalPosition: {x: -66.74091, y: 4.55, z: 22.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

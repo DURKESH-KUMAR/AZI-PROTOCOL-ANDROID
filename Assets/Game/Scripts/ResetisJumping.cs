@@ -2,9 +2,8 @@ using UnityEngine;
 
 public class ResetisJumping : StateMachineBehaviour
 {
-    override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        animator.SetBool("isJumping", false);
-       
+        animator.SetBool(AnimatorManager.IsJumpingHash, false);
     }
 }

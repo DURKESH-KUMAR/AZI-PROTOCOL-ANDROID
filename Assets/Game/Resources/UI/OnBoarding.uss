@@ -1,0 +1,269 @@
+/* OnBoarding (pre-match deployment briefing). Replaces the uGUI Canvas in OnBoarding.unity. */
+
+/* Full-bleed art lives on the document root (set in code) so it also covers notch strips.
+   This element only carries the slow "Ken Burns" zoom. */
+.art {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    -unity-background-scale-mode: scale-and-crop;
+    scale: 1.02 1.02;
+    transition-property: scale;
+    transition-duration: 6s;
+    transition-timing-function: ease-out;
+}
+
+.art--zoom {
+    scale: 1.12 1.12;
+}
+
+.shade {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    -unity-background-scale-mode: stretch-to-fill;
+}
+
+.briefing {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    padding: 44px 80px 40px 80px;
+    justify-content: space-between;
+    opacity: 0;
+    translate: 0 20px;
+    transition-property: opacity, translate;
+    transition-duration: 0.5s, 0.6s;
+    transition-timing-function: ease-out, ease-out-cubic;
+}
+
+.briefing--in {
+    opacity: 1;
+    translate: 0 0;
+}
+
+/* ------------------------------------------------------------ top bar */
+
+.topbar {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.brand {
+    flex-direction: row;
+    align-items: center;
+}
+
+.brand__bar {
+    width: 6px;
+    height: 46px;
+    margin-right: 16px;
+    background-color: var(--accent);
+}
+
+.brand__name {
+    font-size: 34px;
+    letter-spacing: 5px;
+}
+
+.brand__name--accent {
+    color: var(--accent);
+    margin-left: 12px;
+}
+
+.room-chip {
+    flex-direction: row;
+    align-items: center;
+    padding: 12px 22px;
+    background-color: rgba(10, 15, 23, 0.7);
+    border-radius: 4px;
+    border-left-width: 4px;
+    border-left-color: var(--accent);
+}
+
+.room-chip__label {
+    font-size: 20px;
+    color: var(--muted);
+    letter-spacing: 3px;
+    margin-right: 14px;
+}
+
+.room-chip__value {
+    font-size: 26px;
+}
+
+/* ------------------------------------------------------------ bottom block */
+
+.bottom {
+    align-items: stretch;
+}
+
+.kicker {
+    font-size: 24px;
+    color: var(--accent);
+    letter-spacing: 8px;
+    margin-bottom: 4px;
+}
+
+.headline {
+    font-size: 76px;
+    letter-spacing: 4px;
+    margin-bottom: 6px;
+}
+
+.caption {
+    font-size: 24px;
+    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 3px;
+    margin-bottom: 26px;
+}
+
+.info-row {
+    flex-direction: row;
+    align-items: stretch;
+    margin-bottom: 26px;
+}
+
+.team-card {
+    flex-direction: row;
+    align-items: center;
+    padding: 16px 26px;
+    margin-right: 18px;
+    background-color: rgba(10, 15, 23, 0.72);
+    border-radius: 4px;
+    border-left-width: 6px;
+    border-left-color: var(--muted);
+}
+
+.team-card--blue {
+    border-left-color: var(--blue);
+}
+
+.team-card--red {
+    border-left-color: var(--red);
+}
+
+.team-card__label {
+    font-size: 20px;
+    color: var(--muted);
+    letter-spacing: 3px;
+    margin-right: 14px;
+}
+
+.team-card__value {
+    font-size: 34px;
+}
+
+.versus {
+    flex-direction: row;
+    align-items: center;
+    padding: 16px 26px;
+    margin-right: 18px;
+    background-color: rgba(10, 15, 23, 0.72);
+    border-radius: 4px;
+}
+
+.versus__blue {
+    font-size: 34px;
+    color: var(--blue);
+}
+
+.versus__vs {
+    font-size: 22px;
+    color: var(--muted);
+    margin: 0 14px;
+}
+
+.versus__red {
+    font-size: 34px;
+    color: var(--red);
+}
+
+.tip {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-direction: row;
+    align-items: center;
+    padding: 16px 26px;
+    background-color: rgba(10, 15, 23, 0.72);
+    border-radius: 4px;
+}
+
+.tip__label {
+    font-size: 20px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    margin-right: 16px;
+}
+
+.tip__text {
+    flex-shrink: 1;
+    font-size: 24px;
+    white-space: normal;
+    opacity: 1;
+    transition-property: opacity;
+    transition-duration: 0.25s;
+}
+
+.tip__text--out {
+    opacity: 0;
+}
+
+/* ------------------------------------------------------------ progress */
+
+.progress-row {
+    flex-direction: row;
+    align-items: center;
+}
+
+.progress-label {
+    width: 330px;
+    font-size: 26px;
+    letter-spacing: 4px;
+}
+
+.progress {
+    flex-grow: 1;
+    height: 10px;
+    background-color: rgba(255, 255, 255, 0.14);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.progress__fill {
+    height: 100%;
+    width: 0;
+    background-color: var(--accent);
+}
+
+/* Indeterminate sweep while waiting for the host. */
+.progress__sweep {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 22%;
+    background-color: rgba(255, 184, 48, 0.85);
+    display: none;
+}
+
+.progress--waiting .progress__fill {
+    display: none;
+}
+
+.progress--waiting .progress__sweep {
+    display: flex;
+}
+
+.progress-percent {
+    width: 110px;
+    font-size: 26px;
+    color: var(--accent);
+    -unity-text-align: middle-right;
+}

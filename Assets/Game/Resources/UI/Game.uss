@@ -1,0 +1,235 @@
+/* =====================================================================
+   PHANTOM WARRIOR - shared UI Toolkit styles (menu, HUD, controls, results, settings)
+   Panel height is always 1080 (PanelSettings matches height), width follows the phone's
+   aspect ratio (1920 at 16:9, ~2340 at 19.5:9). Layouts anchor to edges, so nothing
+   overflows on tall phones; GameUI insets every screen by the display cut-out (safe area).
+   ===================================================================== */
+
+/* Chernobyl stencil font for ALL text: labels, buttons, text fields, toggles. */
+.unity-text-element {
+    -unity-font: url("/Assets/Font/Chernobyl.otf");
+    -unity-font-style: normal; /* the font is already heavy; synthetic bold blurs it */
+}
+
+:root {
+    --accent: #FFB830;
+    --text: #EDF2FF;
+    --muted: #9AA4B2;
+    --panel: rgba(10, 15, 23, 0.85);
+    --panel-light: rgba(31, 38, 51, 0.94);
+    --blue: #409EFF;
+    --red: #FF524D;
+    --danger: rgba(115, 20, 20, 0.95);
+}
+
+Label {
+    color: var(--text);
+    padding: 0;
+    margin: 0;
+    -unity-text-outline-width: 0;
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.75);
+}
+
+.fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.hidden {
+    display: none;
+}
+
+.panel {
+    background-color: var(--panel);
+    border-radius: 6px;
+}
+
+.title {
+    font-size: 72px;
+    color: var(--accent);
+    -unity-text-align: middle-center;
+}
+
+.muted {
+    color: var(--muted);
+}
+
+/* ------------------------------------------------------------ buttons */
+
+.btn {
+    width: 520px;
+    height: 96px;
+    margin: 10px 0;
+    padding: 0;
+    background-color: var(--panel-light);
+    border-width: 0;
+    border-left-width: 6px;
+    border-left-color: var(--accent);
+    border-radius: 4px;
+    color: var(--text);
+    font-size: 34px;
+    -unity-text-align: middle-center;
+    transition-property: scale, background-color;
+    transition-duration: 0.08s, 0.12s;
+}
+
+.btn:hover {
+    background-color: rgba(52, 62, 82, 0.96);
+}
+
+.btn:active {
+    scale: 0.96 0.96;
+}
+
+.btn:disabled {
+    opacity: 0.45;
+}
+
+.btn--danger {
+    background-color: var(--danger);
+}
+
+.btn--primary {
+    background-color: rgba(140, 97, 13, 0.96);
+}
+
+.btn--small {
+    width: 220px;
+    height: 70px;
+    font-size: 26px;
+    margin: 0;
+}
+
+/* ------------------------------------------------------------ overlay (pause / settings backdrop) */
+
+.overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.66);
+    align-items: center;
+    justify-content: center;
+}
+
+/* ------------------------------------------------------------ settings */
+
+.settings {
+    width: 920px;
+    padding: 36px 50px 30px 50px;
+    background-color: var(--panel);
+    border-radius: 6px;
+    border-top-width: 4px;
+    border-top-color: var(--accent);
+}
+
+.settings__title {
+    font-size: 46px;
+    color: var(--accent);
+    margin-bottom: 18px;
+}
+
+.setting-row {
+    flex-direction: row;
+    align-items: center;
+    height: 72px;
+}
+
+.setting-row__label {
+    width: 430px;
+    font-size: 24px;
+    letter-spacing: 1px;
+}
+
+.setting-row__value {
+    width: 120px;
+    font-size: 28px;
+    color: var(--accent);
+    -unity-text-align: middle-right;
+}
+
+.setting-slider {
+    flex-grow: 1;
+    margin: 0 12px 0 0;
+}
+
+.setting-slider .unity-base-slider__tracker {
+    height: 8px;
+    margin-top: -4px;
+    background-color: rgba(255, 255, 255, 0.15);
+    border-width: 0;
+}
+
+.setting-slider .unity-base-slider__dragger {
+    width: 34px;
+    height: 34px;
+    margin-top: -17px;
+    border-radius: 17px;
+    border-width: 0;
+    background-color: var(--accent);
+}
+
+.setting-toggle {
+    margin-left: auto;
+}
+
+.setting-toggle .unity-toggle__checkmark {
+    width: 60px;
+    height: 60px;
+    border-radius: 6px;
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+.setting-cycle {
+    width: 300px;
+    height: 60px;
+    margin-left: auto;
+    font-size: 26px;
+}
+
+.settings__done {
+    align-self: center;
+    width: 360px;
+    height: 80px;
+    margin-top: 20px;
+}
+
+/* ------------------------------------------------------------ runtime overlay (toast / fps) */
+
+.toast {
+    position: absolute;
+    top: 150px;
+    left: 50%;
+    translate: -50% 0;
+    min-width: 700px;
+    padding: 16px 40px;
+    background-color: var(--panel);
+    border-radius: 6px;
+    font-size: 30px;
+    -unity-text-align: middle-center;
+    opacity: 0;
+    transition-property: opacity;
+    transition-duration: 0.3s;
+}
+
+.toast--show {
+    opacity: 1;
+}
+
+.fps {
+    position: absolute;
+    top: 6px;
+    right: 12px;
+    font-size: 22px;
+    color: #99FF99;
+}
+
+.menu-settings {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+}

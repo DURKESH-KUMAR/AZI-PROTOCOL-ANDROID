@@ -14,20 +14,39 @@ public class PlayerListItem : MonoBehaviourPunCallbacks
     public void SetUp(Player _player)
     {
         player = _player;
-        playerUsername.text = _player.NickName;
-        RefreshTeam();
+        Refresh();
     }
 
-    void RefreshTeam()
+    void Refresh()
     {
+        if (player == null)
+            return;
+
         int team = PlayerTeams.GetTeam(player);
-        teamText.text = team > 0 ? "Team " + team : "Team -";
+        Color color = Teams.Color(team);
+
+        string name = player.NickName;
+        if (player.IsLocal)
+            name += "  (you)";
+        if (player.IsMasterClient)
+            name += "  [HOST]";
+        playerUsername.text = name;
+        playerUsername.color = player.IsLocal ? GameUI.Accent : Color.white;
+
+        bool ready = player.IsMasterClient || GameProps.GetBool(player.CustomProperties, GameProps.Ready);
+        teamText.text = (team > 0 ? Teams.Name(team) : "-") + (ready ? "  READY" : "  ...");
+        teamText.color = color;
     }
 
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
     {
-        if (targetPlayer == player && changedProps.ContainsKey(PlayerTeams.TeamKey))
-            RefreshTeam();
+        if (targetPlayer == player)
+            Refresh();
+    }
+
+    public override void OnMasterClientSwitched(Player newMasterClient)
+    {
+        Refresh();
     }
 
     public override void OnPlayerLeftRoom(Player otherPlayer)

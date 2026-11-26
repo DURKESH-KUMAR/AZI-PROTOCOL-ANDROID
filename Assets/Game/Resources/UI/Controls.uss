@@ -1,0 +1,337 @@
+/* Local player's touch controls (replaces the "Health&Crosshair" and "ScopeCanvas" uGUI canvases
+   in Player.prefab). Positions match the original prefab at 1920x1080. */
+
+.controls {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+/* ------------------------------------------------------------ sticks */
+
+.stick-zone {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 780px;
+    height: 640px;
+}
+
+.stick-zone--look {
+    left: auto;
+    right: 0;
+    width: 330px;
+    height: 330px;
+}
+
+.stick {
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    border-radius: 125px;
+    border-width: 4px;
+    border-color: rgba(255, 255, 255, 0.55);
+    background-color: rgba(10, 15, 23, 0.25);
+    align-items: center;
+    justify-content: center;
+    opacity: 0.75;
+    transition-property: opacity, border-color;
+    transition-duration: 0.15s, 0.15s;
+}
+
+.stick--move {
+    left: 91px;
+    bottom: 48px;
+}
+
+.stick--look {
+    right: 37px;
+    bottom: 48px;
+}
+
+.stick--active {
+    opacity: 1;
+    border-color: var(--accent);
+}
+
+.stick__knob {
+    width: 118px;
+    height: 118px;
+    border-radius: 59px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-width: 6px;
+    border-color: rgba(255, 255, 255, 0.35);
+}
+
+.stick--active .stick__knob {
+    background-color: var(--accent);
+}
+
+.stick__ring {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    right: 20px;
+    bottom: 20px;
+    border-radius: 105px;
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ------------------------------------------------------------ action buttons */
+
+.action {
+    position: absolute;
+    border-radius: 999px;
+    background-color: rgba(10, 15, 23, 0.35);
+    border-width: 3px;
+    border-color: rgba(255, 255, 255, 0.5);
+    -unity-background-scale-mode: scale-to-fit;
+    transition-property: scale, border-color, background-color;
+    transition-duration: 0.07s, 0.1s, 0.1s;
+}
+
+.action--pressed {
+    scale: 0.88 0.88;
+    border-color: var(--accent);
+    background-color: rgba(255, 184, 48, 0.3);
+}
+
+.action--on {
+    border-color: var(--accent);
+    background-color: rgba(255, 184, 48, 0.35);
+}
+
+.action__label {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -32px;
+    font-size: 20px;
+    letter-spacing: 2px;
+    -unity-text-align: middle-center;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.action--fire {
+    width: 150px;
+    height: 150px;
+    bottom: 74px;
+    background-image: url("/Assets/Icon/Untitled_design__1_-removebg-preview.png");
+}
+
+.action--fire-right {
+    right: 320px;
+}
+
+.action--fire-left {
+    left: 366px;
+}
+
+.action--sprint {
+    width: 125px;
+    height: 125px;
+    right: 100px;
+    bottom: 321px;
+    background-image: url("/Assets/Icon/Untitled_design__4_-removebg-preview.png");
+}
+
+.action--jump {
+    width: 125px;
+    height: 125px;
+    left: 142px;
+    bottom: 314px;
+    background-image: url("/Assets/Icon/Untitled_design__2_-removebg-preview.png");
+}
+
+.action--reload {
+    width: 112px;
+    height: 112px;
+    right: 340px;
+    bottom: 280px;
+    background-image: url("/Assets/Icon/Untitled_design__3_-removebg-preview.png");
+}
+
+.action--aim {
+    width: 112px;
+    height: 112px;
+    right: 112px;
+    bottom: 500px;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Aim icon drawn with USS: a ring with a dot. */
+.aim-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 27px;
+    border-width: 4px;
+    border-color: #FFFFFF;
+    align-items: center;
+    justify-content: center;
+}
+
+.aim-icon__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background-color: #FFFFFF;
+}
+
+.action--disabled {
+    opacity: 0.35;
+}
+
+/* ------------------------------------------------------------ health */
+
+.health {
+    position: absolute;
+    bottom: 26px;
+    left: 50%;
+    translate: -50% 0;
+    width: 560px;
+    flex-direction: row;
+    align-items: center;
+}
+
+.health__icon {
+    font-size: 26px;
+    color: var(--muted);
+    margin-right: 12px;
+}
+
+.health__track {
+    flex-grow: 1;
+    height: 22px;
+    background-color: rgba(10, 15, 23, 0.7);
+    border-width: 2px;
+    border-color: rgba(255, 255, 255, 0.25);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.health__trail {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.85);
+}
+
+.health__fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: #59D97A;
+}
+
+.health__value {
+    width: 90px;
+    font-size: 30px;
+    -unity-text-align: middle-right;
+}
+
+.health--low .health__track {
+    border-color: var(--red);
+}
+
+.health--low .health__value {
+    color: var(--red);
+}
+
+/* ------------------------------------------------------------ crosshair */
+
+.crosshair {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 0;
+    height: 0;
+}
+
+.crosshair__dot {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    left: -2px;
+    top: -2px;
+    border-radius: 2px;
+    background-color: #FFFFFF;
+}
+
+.crosshair__line {
+    position: absolute;
+    background-color: #FFFFFF;
+    border-width: 1px;
+    border-color: rgba(0, 0, 0, 0.45);
+}
+
+.crosshair__line--h {
+    width: 16px;
+    height: 4px;
+    top: -2px;
+}
+
+.crosshair__line--v {
+    width: 4px;
+    height: 16px;
+    left: -2px;
+}
+
+.crosshair--enemy .crosshair__line,
+.crosshair--enemy .crosshair__dot {
+    background-color: var(--red);
+}
+
+/* ------------------------------------------------------------ scope */
+
+.scope {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition-property: opacity;
+    transition-duration: 0.12s;
+}
+
+.scope--on {
+    opacity: 1;
+}
+
+.scope__vignette {
+    position: absolute;
+    left: -10%;
+    top: -10%;
+    right: -10%;
+    bottom: -10%;
+    -unity-background-scale-mode: stretch-to-fill;
+    -unity-background-image-tint-color: rgba(0, 0, 0, 0.95);
+}
+
+.scope__reticle {
+    width: 560px;
+    height: 560px;
+    background-image: url("/Assets/OccaSoftware/Crosshairs/Art/Textures/Crosshair_17.png");
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+/* While aiming: keep the sticks, fire and aim; fade the rest. */
+.controls--scoped .action--jump,
+.controls--scoped .action--sprint,
+.controls--scoped .action--reload {
+    opacity: 0.25;
+}
+
+.controls--scoped .crosshair {
+    display: none;
+}

@@ -1,13 +1,16 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Photon.Pun;
-using System.IO;
+
 
 public class RoomManager : MonoBehaviourPunCallbacks
 {
     public static RoomManager instance;
 
-    [SerializeField] int gameSceneIndex = 3;
+    // Resources path. Forward slash always works; Path.Combine gives '\' on Windows.
+    const string PlayerControllerManagerPrefab = "PhotonPrefabs/PlayerControllerManager";
+
+
 
     void Awake()
     {
@@ -40,9 +43,9 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
     void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
     {
-        if (scene.buildIndex == gameSceneIndex && PhotonNetwork.InRoom)
+        if (GameScenes.IsMatch(scene) && PhotonNetwork.InRoom)
         {
-            PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PlayerControllerManager"), Vector3.zero, Quaternion.identity);
+            PhotonNetwork.Instantiate(PlayerControllerManagerPrefab, Vector3.zero, Quaternion.identity);
         }
     }
 }

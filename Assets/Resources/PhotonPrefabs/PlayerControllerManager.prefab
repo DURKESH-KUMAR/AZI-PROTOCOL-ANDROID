@@ -67,4 +67,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e866c41cefacd8b409e6e0343a6a4111, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerControllerManager
+  respawnDelay: 3
   playerTeam: 0

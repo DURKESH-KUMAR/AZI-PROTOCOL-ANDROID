@@ -26,30 +26,32 @@ public class DialogueManager : MonoBehaviour
 
     IEnumerator PlayDialogueLoop()
     {
+        // An empty list used to spin this loop forever without yielding (game freeze).
+        if (dialogueList == null || dialogueList.Count == 0 || dialogueTextUI == null)
+            yield break;
+
+        // Cached waits: no allocation per line.
+        WaitForSeconds visible = new WaitForSeconds(textVisibleTime);
+        float remainingTime = totalDialogueInterval - textVisibleTime;
+        WaitForSeconds remaining = remainingTime > 0f ? new WaitForSeconds(remainingTime) : null;
+
         while (true) // Loop forever
         {
             for (int i = 0; i < dialogueList.Count; i++)
             {
-                // Show text
                 dialogueTextUI.text = dialogueList[i].dialogueText;
 
-                // Play audio
-                if (dialogueList[i].audioClip != null)
+                if (audioSource != null && dialogueList[i].audioClip != null)
                 {
                     audioSource.clip = dialogueList[i].audioClip;
                     audioSource.Play();
                 }
 
-                // Text visible for 3 seconds
-                yield return new WaitForSeconds(textVisibleTime);
-
-                // Hide text
+                yield return visible;
                 dialogueTextUI.text = "";
 
-                // Wait remaining time (10 - 3 = 7 seconds)
-                float remainingTime = totalDialogueInterval - textVisibleTime;
-                if (remainingTime > 0)
-                    yield return new WaitForSeconds(remainingTime);
+                if (remaining != null)
+                    yield return remaining;
             }
         }
     }

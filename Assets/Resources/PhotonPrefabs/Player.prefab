@@ -1113,13 +1113,20 @@ MonoBehaviour:
   maxPivotAngle: 30
   collisionLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 72705
   cameraCollisionOffset: 0.2
   minCollisionOffset: 0.2
   cameraCollisionRadius: 0.2
+  collisionSharpness: 14
   scopeCanvas: {fileID: 107095680119847499}
   playerUI: {fileID: 6428319169610781746}
   mainCamera: {fileID: 2714051261720731953}
+  scopedFOV: 10
+  sprintFovBoost: 8
+  fovSharpness: 8
+  recoilRecovery: 9
+  maxShakeAngle: 2.2
+  shakeDecay: 1.6
 --- !u!1 &2374311068281264421
 GameObject:
   m_ObjectHideFlags: 0
@@ -2054,16 +2061,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 602658fe003877848acedbe036a99ef7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
+  maxHealth: 150
   currentHealth: 0
   healthbarSlider: {fileID: 8947366371686806371}
   playerUI: {fileID: 6428319169610781746}
+  spawnProtectionTime: 2
   inAirTimer: 0
   leapingVelocity: 0.25
   fallingVelocity: 30
   rayCastHeightOffset: 0.5
+  groundCheckDistance: 1
   groundLayer:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 72705
+  killPlaneY: -40
   isMoving: 0
   isSprinting: 0
   isGrounded: 0
@@ -2073,7 +2084,8 @@ MonoBehaviour:
   sprintingSpeed: 5
   jumpHeight: 3
   gravityIntensity: -3
-  playerTeam: 0
+  maxJumpTime: 1.5
+  corpseTime: 2.2
 --- !u!136 &7716247134700032662
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -2160,7 +2172,11 @@ MonoBehaviour:
   reloadingSoundClip: {fileID: 8300000, guid: de9edfef581c9034f9bf27e9d68ba5e9, type: 3}
   muzzleFlash: {fileID: 19800008, guid: 8f611da60097c85438a2947021f045cf, type: 3}
   bloodEffect: {fileID: 19800014, guid: a57a6829db3568c4d9bdc37e9e63c017, type: 3}
-  playerTeam: 0
+  recoilPitch: 0.9
+  recoilYaw: 0.35
+  tracerColor: {r: 1, g: 0.85, b: 0.45, a: 0.9}
+  tracerWidth: 0.025
+  tracerTime: 0.06
 --- !u!82 &7447047792536731853
 AudioSource:
   m_ObjectHideFlags: 0

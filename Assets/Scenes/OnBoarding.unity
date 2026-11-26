@@ -267,7 +267,7 @@ GameObject:
   - component: {fileID: 404072408}
   - component: {fileID: 404072409}
   m_Layer: 0
-  m_Name: Video Player
+  m_Name: Image Loader
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -301,12 +301,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RandomLoadingScreen
   loadingImages:
-  - {fileID: 21300000, guid: b9ffb1a53f66f0f489b4c38a6249ebd1, type: 3}
   - {fileID: 21300000, guid: d8453483409e41447869f17c5653fc47, type: 3}
   - {fileID: 21300000, guid: efa9c198d41b04c4ab688de89fcdbf3a, type: 3}
   - {fileID: 21300000, guid: f4307ecbb1cd9a7449eb0d55c1387879, type: 3}
   - {fileID: 21300000, guid: eeb32277e92349444ba3298e3a20de37, type: 3}
-  - {fileID: 21300000, guid: 429ad854207e63e42a70dae1a3da7445, type: 3}
   loadingImage: {fileID: 1454569358}
   loadingDuration: 2
   useUnscaledTime: 1

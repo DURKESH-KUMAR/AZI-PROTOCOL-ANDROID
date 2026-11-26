@@ -4,8 +4,18 @@ public class ResetBool : StateMachineBehaviour
 {
     public string isInteractingBool;
     public bool isInteractingStatus;
-    override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+
+    // Hash the parameter name once instead of on every state enter.
+    int boolHash;
+    string hashedName;
+
+    public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        animator.SetBool(isInteractingBool,isInteractingStatus);
+        if (!ReferenceEquals(hashedName, isInteractingBool))
+        {
+            hashedName = isInteractingBool;
+            boolHash = Animator.StringToHash(isInteractingBool);
+        }
+        animator.SetBool(boolHash, isInteractingStatus);
     }
 }

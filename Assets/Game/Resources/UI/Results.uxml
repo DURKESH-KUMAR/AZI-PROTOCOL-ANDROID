@@ -1,0 +1,33 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="Game.uss" />
+    <Style src="Results.uss" />
+    <ui:VisualElement name="results" class="results">
+        <ui:Label name="banner" text="MATCH OVER" class="results__banner" picking-mode="Ignore" />
+        <ui:Label name="reason" class="results__reason" picking-mode="Ignore" />
+        <ui:VisualElement name="line" class="results__line" picking-mode="Ignore" />
+
+        <ui:VisualElement class="score-row" picking-mode="Ignore">
+            <ui:VisualElement name="blue-score" class="score" picking-mode="Ignore">
+                <ui:Label name="blue-label" text="BLUE" class="score__label" picking-mode="Ignore" />
+                <ui:Label name="blue-value" text="0" class="score__value" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:Label text="-" class="score__dash" picking-mode="Ignore" />
+            <ui:VisualElement name="red-score" class="score" picking-mode="Ignore">
+                <ui:Label name="red-label" text="RED" class="score__label" picking-mode="Ignore" />
+                <ui:Label name="red-value" text="0" class="score__value" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement class="rosters" picking-mode="Ignore">
+            <ui:VisualElement name="blue-roster" class="roster roster--blue" picking-mode="Ignore" />
+            <ui:VisualElement name="red-roster" class="roster roster--red" picking-mode="Ignore" />
+        </ui:VisualElement>
+
+        <ui:Label name="you" class="results__you" picking-mode="Ignore" />
+
+        <ui:VisualElement class="results__buttons" picking-mode="Ignore">
+            <ui:Button name="menu" text="MAIN MENU" class="btn btn--primary" />
+            <ui:Button name="quit" text="QUIT GAME" class="btn" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

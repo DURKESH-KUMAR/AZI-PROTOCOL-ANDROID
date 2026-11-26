@@ -7,6 +7,8 @@ public class ShootingController : MonoBehaviour
     Animator animator;
     InputManager inputManager;
     PlayerMovement playerMovement;
+    CameraManager cameraManager;
+    Camera aimCamera;
 
     [Header("Shooting Var")]
     public Transform firePoint;
@@ -20,6 +22,7 @@ public class ShootingController : MonoBehaviour
     public int maxAmmo = 30;
     private int currentAmmo;
     public float reloadTime = 1.5f;
+    float reloadStartTime;
 
     [Header("Shooting Flags")]
     public bool isShooting;
@@ -37,9 +40,24 @@ public class ShootingController : MonoBehaviour
     public ParticleSystem muzzleFlash;
     public ParticleSystem bloodEffect;
 
+    [Header("Feel")]
+    public float recoilPitch = 0.9f;
+    public float recoilYaw = 0.35f;
+    public Color tracerColor = new Color(1f, 0.85f, 0.45f, 0.9f);
+    public float tracerWidth = 0.025f;
+    public float tracerTime = 0.06f;
+
     PhotonView view;
     Coroutine reloadRoutine;
     bool reloadUsedShootTrigger;
+    LineRenderer tracer;
+    float tracerHideAt;
+
+    // Last bools written to the Animator (-1 = unknown), so unchanged values aren't re-sent every frame.
+    int lastShootAnimState = -1;
+
+    static readonly RaycastHit[] hitBuffer = new RaycastHit[16];
+    static Material tracerMaterial;
 
     static readonly int ShootHash = Animator.StringToHash("Shoot");
     static readonly int ShootingMovementHash = Animator.StringToHash("ShootingMovement");
@@ -50,17 +68,27 @@ public class ShootingController : MonoBehaviour
     /// <summary>Team of this player (live from Photon properties).</summary>
     public int playerTeam => playerMovement != null ? playerMovement.playerTeam : 0;
 
+    public int CurrentAmmo => currentAmmo;
+    public int MaxAmmo => maxAmmo;
+    public bool IsReloading => isReloading;
+    public float ReloadProgress => isReloading && reloadTime > 0f ? Mathf.Clamp01((Time.time - reloadStartTime) / reloadTime) : 0f;
+    public float LastShotTime { get; private set; } = -100f;
+
     void Awake()
     {
         view = GetComponent<PhotonView>();
         animator = GetComponent<Animator>();
         inputManager = GetComponent<InputManager>();
         playerMovement = GetComponent<PlayerMovement>();
+        cameraManager = GetComponentInChildren<CameraManager>(true);
+        aimCamera = GetComponentInChildren<Camera>(true);
         currentAmmo = maxAmmo;
+        CreateTracer();
     }
 
     void OnDisable()
     {
+        lastShootAnimState = -1;
         // Don't leave a pending reload running on a disabled/destroyed player.
         if (reloadRoutine != null)
         {
@@ -72,13 +100,16 @@ public class ShootingController : MonoBehaviour
 
     void Update()
     {
+        if (tracer != null && tracer.enabled && Time.time >= tracerHideAt)
+            tracer.enabled = false;
+
         if (!view.IsMine)
             return;
 
         // One-shot input: always consume it so a single press can't trigger reloads forever.
         bool reloadPressed = inputManager.ConsumeReloadInput();
 
-        if (isReloading || playerMovement.isSprinting)
+        if (playerMovement.IsDead || isReloading || playerMovement.isSprinting || !MatchState.CombatAllowed || PlayerManager.InputBlocked)
         {
             SetShootAnim(false, false, false);
             isShooting = false;
@@ -115,6 +146,11 @@ public class ShootingController : MonoBehaviour
 
     void SetShootAnim(bool shoot, bool shootingMovement, bool shootWalk)
     {
+        int state = (shoot ? 1 : 0) | (shootingMovement ? 2 : 0) | (shootWalk ? 4 : 0);
+        if (state == lastShootAnimState)
+            return;
+        lastShootAnimState = state;
+
         animator.SetBool(ShootHash, shoot);
         animator.SetBool(ShootingMovementHash, shootingMovement);
         animator.SetBool(ShootWalkHash, shootWalk);
@@ -137,48 +173,133 @@ public class ShootingController : MonoBehaviour
         }
 
         currentAmmo--;
-        bool hitEnemy = false;
-        Vector3 hitPoint = Vector3.zero;
-        Vector3 hitNormal = Vector3.up;
+        LastShotTime = Time.time;
 
-        if (Physics.Raycast(firePoint.position, firePoint.forward, out RaycastHit hit, fireRange, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+        bool hitEnemy = false;
+        Vector3 hitNormal = Vector3.up;
+        Ray ray = AimRay();
+        Vector3 endPoint = ray.origin + ray.direction * fireRange;
+
+        if (FindHit(ray, out RaycastHit hit))
         {
+            endPoint = hit.point;
+            hitNormal = hit.normal;
+
             // Collider may be on a child bone/mesh, so search upwards.
             PlayerMovement target = hit.collider.GetComponentInParent<PlayerMovement>();
-            if (target != null && target != playerMovement && target.playerTeam != playerTeam)
+            if (target != null && target != playerMovement && !target.IsDead && target.playerTeam != playerTeam)
             {
-                target.ApplyDamage(fireDamage);
+                if (!target.IsSpawnProtected)
+                {
+                    target.ApplyDamage(fireDamage, PhotonNetwork.LocalPlayer.ActorNumber, transform.position);
+                    MatchEvents.RaiseLocalHit();
+                }
                 hitEnemy = true;
-                hitPoint = hit.point;
-                hitNormal = hit.normal;
             }
         }
 
-        // Local feedback immediately, everyone else via RPC (they previously never saw/heard shots).
-        PlayShotEffects(hitEnemy, hitPoint, hitNormal);
-        view.RPC(nameof(RPC_Shoot), RpcTarget.Others, hitEnemy, hitPoint, hitNormal);
+        if (cameraManager != null)
+            cameraManager.AddRecoil(recoilPitch, recoilYaw);
+
+        // Local feedback immediately, everyone else via RPC.
+        PlayShotEffects(hitEnemy, endPoint, hitNormal);
+        view.RPC(nameof(RPC_Shoot), RpcTarget.Others, hitEnemy, endPoint, hitNormal);
+    }
+
+    /// <summary>
+    /// Aim through the centre of the screen (where the crosshair is), not along the gun barrel:
+    /// in third person the barrel and the view point in different directions.
+    /// The ray starts level with the player so walls BEHIND the player (between it and the camera) are ignored.
+    /// </summary>
+    Ray AimRay()
+    {
+        if (aimCamera == null || !aimCamera.isActiveAndEnabled)
+            return new Ray(firePoint.position, firePoint.forward);
+
+        Ray ray = aimCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+        float skip = Vector3.Dot(firePoint.position - ray.origin, ray.direction);
+        if (skip > 0f)
+            ray.origin += ray.direction * skip;
+        return ray;
+    }
+
+    /// <summary>Nearest hit that is not part of the shooter's own body (fixes shots blocked by yourself).</summary>
+    bool FindHit(Ray ray, out RaycastHit best)
+    {
+        int count = Physics.RaycastNonAlloc(ray, hitBuffer, fireRange, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+        best = default;
+        float bestDistance = float.MaxValue;
+        for (int i = 0; i < count; i++)
+        {
+            RaycastHit h = hitBuffer[i];
+            if (h.distance >= bestDistance || h.collider.transform.IsChildOf(transform))
+                continue;
+            best = h;
+            bestDistance = h.distance;
+        }
+        return bestDistance < float.MaxValue;
     }
 
     [PunRPC]
     void RPC_Shoot(bool hitEnemy, Vector3 hitPoint, Vector3 hitNormal)
     {
+        LastShotTime = Time.time;
         PlayShotEffects(hitEnemy, hitPoint, hitNormal);
     }
 
-    void PlayShotEffects(bool hitEnemy, Vector3 hitPoint, Vector3 hitNormal)
+    void PlayShotEffects(bool hitEnemy, Vector3 endPoint, Vector3 hitNormal)
     {
         if (muzzleFlash != null)
             muzzleFlash.Play();
         if (soundAudioSource != null && shootingSoundClip != null)
             soundAudioSource.PlayOneShot(shootingSoundClip);
 
+        ShowTracer(endPoint);
+
         if (hitEnemy && bloodEffect != null)
+            EffectPool.Play(bloodEffect, endPoint, Quaternion.LookRotation(hitNormal));
+    }
+
+    void CreateTracer()
+    {
+        if (tracerMaterial == null)
         {
-            ParticleSystem blood = Instantiate(bloodEffect, hitPoint, Quaternion.LookRotation(hitNormal));
-            ParticleSystem.MainModule main = blood.main;
-            // Destroy after the last particle can have died, so the effect is always cleaned up.
-            Destroy(blood.gameObject, main.duration + main.startLifetime.constantMax);
+            // UI/Default is in "Always Included Shaders", so this never renders pink on device.
+            Shader shader = Shader.Find("UI/Default");
+            if (shader == null)
+                shader = Shader.Find("Sprites/Default");
+            if (shader != null)
+                tracerMaterial = new Material(shader);
         }
+        if (tracerMaterial == null)
+            return;
+
+        GameObject go = new GameObject("Tracer");
+        go.transform.SetParent(transform, false);
+        tracer = go.AddComponent<LineRenderer>();
+        tracer.sharedMaterial = tracerMaterial;
+        tracer.useWorldSpace = true;
+        tracer.positionCount = 2;
+        tracer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        tracer.receiveShadows = false;
+        tracer.numCapVertices = 2;
+        tracer.startWidth = tracerWidth;
+        tracer.endWidth = tracerWidth * 0.4f;
+        Color end = tracerColor;
+        end.a = 0f;
+        tracer.startColor = tracerColor;
+        tracer.endColor = end;
+        tracer.enabled = false;
+    }
+
+    void ShowTracer(Vector3 endPoint)
+    {
+        if (tracer == null || firePoint == null)
+            return;
+        tracer.SetPosition(0, firePoint.position);
+        tracer.SetPosition(1, endPoint);
+        tracer.enabled = true;
+        tracerHideAt = Time.time + tracerTime;
     }
 
     private void Reload()
@@ -189,9 +310,17 @@ public class ShootingController : MonoBehaviour
         reloadUsedShootTrigger = isShootingInput && isWalking;
         animator.SetTrigger(reloadUsedShootTrigger ? ShootReloadHash : ReloadHash);
         isReloading = true;
+        reloadStartTime = Time.time;
         if (soundAudioSource != null && reloadingSoundClip != null)
             soundAudioSource.PlayOneShot(reloadingSoundClip);
         reloadRoutine = StartCoroutine(FinishReloadingAfterDelay());
+    }
+
+    /// <summary>For a HUD reload button.</summary>
+    public void RequestReload()
+    {
+        if (view.IsMine && !playerMovement.IsDead)
+            Reload();
     }
 
     IEnumerator FinishReloadingAfterDelay()

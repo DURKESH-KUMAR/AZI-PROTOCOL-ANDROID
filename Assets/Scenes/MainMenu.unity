@@ -501,7 +501,9 @@ MonoBehaviour:
   playerListItemPrefab: {fileID: 5447782468013157896, guid: e5dfb709eeca4124a948843207e5da2d,
     type: 3}
   maxPlayersPerRoom: 10
-  onboardingSceneIndex: 2
+  minPlayersToStart: 2
+  allowSoloInEditor: 1
+  reconnectDelay: 3
   startButton: {fileID: 1100063443}
 --- !u!114 &243006352
 MonoBehaviour:

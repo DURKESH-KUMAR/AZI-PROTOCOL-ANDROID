@@ -1,19 +1,24 @@
 using System.Collections;
-using System.IO;
 using UnityEngine;
 using Photon.Pun;
 
 public class PlayerControllerManager : MonoBehaviour
 {
+    // Resources path. Forward slash always works; Path.Combine gives '\' on Windows.
+    const string PlayerPrefab = "PhotonPrefabs/Player";
+
     [SerializeField] float respawnDelay = 3f;
 
     PhotonView view;
     GameObject controller;
+    GameObject deathCamera;
     public int playerTeam;
 
     Transform spawnArea1;
     Transform spawnArea2;
     bool respawning;
+
+    public float RespawnDelay => respawnDelay;
 
     void Awake()
     {
@@ -26,8 +31,20 @@ public class PlayerControllerManager : MonoBehaviour
             CreateController();
     }
 
+    void OnDestroy()
+    {
+        if (deathCamera != null)
+            Destroy(deathCamera);
+    }
+
     void CreateController()
     {
+        if (deathCamera != null)
+        {
+            Destroy(deathCamera); // only one camera / AudioListener at a time
+            deathCamera = null;
+        }
+
         playerTeam = PlayerTeams.GetTeam(PhotonNetwork.LocalPlayer);
         if (playerTeam == 0)
         {
@@ -60,30 +77,81 @@ public class PlayerControllerManager : MonoBehaviour
             return;
         }
 
-        Transform spawnPoint = area.GetChild(Random.Range(0, area.childCount));
-        controller = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "Player"),
+        Transform spawnPoint = PickSafestSpawn(area, team);
+        controller = PhotonNetwork.Instantiate(PlayerPrefab,
             spawnPoint.position, spawnPoint.rotation, 0, new object[] { view.ViewID });
     }
 
-    public void Die()
+    /// <summary>
+    /// Spawn point farthest from living enemies (with a little randomness), so players
+    /// are not spawn-killed by someone standing on top of a spawn point.
+    /// </summary>
+    static Transform PickSafestSpawn(Transform area, int team)
+    {
+        Transform best = area.GetChild(Random.Range(0, area.childCount));
+        float bestScore = float.MinValue;
+        for (int i = 0; i < area.childCount; i++)
+        {
+            Transform point = area.GetChild(i);
+            float nearestEnemy = 10000f;
+            for (int p = 0; p < PlayerRegistry.All.Count; p++)
+            {
+                PlayerMovement other = PlayerRegistry.All[p];
+                if (other == null || other.IsDead || other.playerTeam == team)
+                    continue;
+                nearestEnemy = Mathf.Min(nearestEnemy, (other.transform.position - point.position).sqrMagnitude);
+            }
+            float score = nearestEnemy + Random.Range(0f, 25f);
+            if (score > bestScore)
+            {
+                bestScore = score;
+                best = point;
+            }
+        }
+        return best;
+    }
+
+    /// <summary>
+    /// Called by the local dying body. Keeps the body on screen for <paramref name="corpseTime"/>
+    /// seconds watched by a death camera, removes it, then respawns after the respawn delay.
+    /// </summary>
+    public void Die(GameObject body, float corpseTime)
     {
         if (respawning)
             return;
 
+        if (body != null)
+        {
+            CameraManager cameraManager = body.GetComponentInChildren<CameraManager>(true);
+            Camera cam = cameraManager != null ? cameraManager.DetachCamera() : null;
+            if (cam != null)
+            {
+                deathCamera = cam.gameObject;
+                deathCamera.AddComponent<DeathCamera>().Begin(body.transform);
+            }
+        }
+
+        StartCoroutine(RespawnAfterDelay(Mathf.Min(corpseTime, respawnDelay)));
+    }
+
+    // Kept for callers that still use the old signature.
+    public void Die() => Die(controller, 0f);
+
+    IEnumerator RespawnAfterDelay(float corpseTime)
+    {
+        respawning = true;
+
+        if (corpseTime > 0f)
+            yield return new WaitForSeconds(corpseTime);
         if (controller != null)
         {
             PhotonNetwork.Destroy(controller);
             controller = null;
         }
-        StartCoroutine(RespawnAfterDelay());
-    }
 
-    IEnumerator RespawnAfterDelay()
-    {
-        respawning = true;
-        yield return new WaitForSeconds(respawnDelay);
+        yield return new WaitForSeconds(Mathf.Max(0f, respawnDelay - corpseTime));
         respawning = false;
-        if (view.IsMine && PhotonNetwork.InRoom)
+        if (view.IsMine && PhotonNetwork.InRoom && !MatchState.IsOver)
             CreateController();
     }
 }

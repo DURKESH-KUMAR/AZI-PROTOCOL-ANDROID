@@ -1,0 +1,66 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="Game.uss" />
+    <Style src="Controls.uss" />
+    <ui:VisualElement name="controls" class="controls" picking-mode="Ignore">
+
+        <!-- scope overlay (was ScopeCanvas) -->
+        <ui:VisualElement name="scope" class="scope" picking-mode="Ignore">
+            <ui:VisualElement name="scope-vignette" class="scope__vignette" picking-mode="Ignore" />
+            <ui:VisualElement class="scope__reticle" picking-mode="Ignore" />
+        </ui:VisualElement>
+
+        <!-- crosshair (lines spread while moving / firing) -->
+        <ui:VisualElement name="crosshair" class="crosshair" picking-mode="Ignore">
+            <ui:VisualElement name="ch-left" class="crosshair__line crosshair__line--h" picking-mode="Ignore" />
+            <ui:VisualElement name="ch-right" class="crosshair__line crosshair__line--h" picking-mode="Ignore" />
+            <ui:VisualElement name="ch-up" class="crosshair__line crosshair__line--v" picking-mode="Ignore" />
+            <ui:VisualElement name="ch-down" class="crosshair__line crosshair__line--v" picking-mode="Ignore" />
+            <ui:VisualElement class="crosshair__dot" picking-mode="Ignore" />
+        </ui:VisualElement>
+
+        <!-- movement: the stick appears where the thumb lands inside this zone -->
+        <ui:VisualElement name="move-zone" class="touch stick-zone">
+            <ui:VisualElement name="move-stick" class="stick stick--move" picking-mode="Ignore">
+                <ui:VisualElement class="stick__ring" picking-mode="Ignore" />
+                <ui:VisualElement name="move-knob" class="stick__knob" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- camera look stick (fixed, like the original) -->
+        <ui:VisualElement name="look-zone" class="touch stick-zone stick-zone--look">
+            <ui:VisualElement name="look-stick" class="stick stick--look" picking-mode="Ignore">
+                <ui:VisualElement class="stick__ring" picking-mode="Ignore" />
+                <ui:VisualElement name="look-knob" class="stick__knob" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- actions -->
+        <ui:VisualElement name="fire-left" class="touch action action--fire action--fire-left" />
+        <ui:VisualElement name="fire-right" class="touch action action--fire action--fire-right" />
+        <ui:VisualElement name="jump" class="touch action action--jump">
+            <ui:Label text="JUMP" class="action__label" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:VisualElement name="sprint" class="touch action action--sprint">
+            <ui:Label text="SPRINT" class="action__label" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:VisualElement name="reload" class="touch action action--reload">
+            <ui:Label text="RELOAD" class="action__label" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:VisualElement name="aim" class="touch action action--aim">
+            <ui:VisualElement class="aim-icon" picking-mode="Ignore">
+                <ui:VisualElement class="aim-icon__dot" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:Label text="AIM" class="action__label" picking-mode="Ignore" />
+        </ui:VisualElement>
+
+        <!-- health (was HealthBarSlider) -->
+        <ui:VisualElement name="health" class="health" picking-mode="Ignore">
+            <ui:Label text="HP" class="health__icon" picking-mode="Ignore" />
+            <ui:VisualElement class="health__track" picking-mode="Ignore">
+                <ui:VisualElement name="health-trail" class="health__trail" picking-mode="Ignore" />
+                <ui:VisualElement name="health-fill" class="health__fill" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:Label name="health-value" text="150" class="health__value" picking-mode="Ignore" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

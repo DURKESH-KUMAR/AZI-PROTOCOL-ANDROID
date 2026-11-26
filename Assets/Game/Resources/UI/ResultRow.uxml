@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="row" class="result-row" picking-mode="Ignore">
+        <ui:Label name="name" class="result-row__name" picking-mode="Ignore" />
+        <ui:Label name="kills" class="result-row__stat" picking-mode="Ignore" />
+        <ui:Label name="deaths" class="result-row__stat" picking-mode="Ignore" />
+        <ui:Label name="ratio" class="result-row__stat" picking-mode="Ignore" />
+    </ui:VisualElement>
+</ui:UXML>
