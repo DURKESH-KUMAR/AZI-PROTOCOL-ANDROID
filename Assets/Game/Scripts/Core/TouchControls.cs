@@ -8,30 +8,35 @@ public interface IStickInput
     Vector2 Value { get; }
 }
 
+/// <summary>Anything that provides camera-look drag since the last frame (panel units, +y = up).</summary>
+public interface ILookInput
+{
+    Vector2 ConsumeDelta();
+}
+
 /// <summary>
-/// Virtual joystick for UI Toolkit. Each stick tracks its own touch (pointerId), so moving,
-/// looking and firing work at the same time. A "floating" stick jumps to wherever the thumb
-/// lands inside its zone and returns home on release (more forgiving on different phone sizes).
+/// Fixed virtual joystick for UI Toolkit (left thumb, movement). The stick never moves; a touch
+/// anywhere inside its (larger) activation zone steers relative to the stick's centre, so it is
+/// easy to grab without looking. Each control tracks its own pointerId, so moving, looking and
+/// firing work at the same time.
 /// </summary>
 public sealed class TouchStick : IStickInput
 {
     readonly VisualElement zone, stick, knob;
-    readonly bool floating;
     int pointerId = -1;
     Vector2 center;
 
     public Vector2 Value { get; private set; }
     public bool IsHeld => pointerId != -1;
 
-    public TouchStick(VisualElement zone, VisualElement stick, VisualElement knob, bool floating)
+    public TouchStick(VisualElement zone, VisualElement stick, VisualElement knob)
     {
         this.zone = zone;
         this.stick = stick;
         this.knob = knob;
-        this.floating = floating;
         zone.RegisterCallback<PointerDownEvent>(OnDown);
-        zone.RegisterCallback<PointerMoveEvent>(OnMove);
-        zone.RegisterCallback<PointerUpEvent>(OnUp);
+        zone.RegisterCallback<PointerMoveEvent>(e => { if (e.pointerId == pointerId) Track(e.localPosition); });
+        zone.RegisterCallback<PointerUpEvent>(e => { if (e.pointerId == pointerId) Release(); });
         zone.RegisterCallback<PointerCancelEvent>(e => { if (e.pointerId == pointerId) Release(); });
         zone.RegisterCallback<PointerCaptureOutEvent>(e => { if (e.pointerId == pointerId) Release(); });
     }
@@ -43,37 +48,9 @@ public sealed class TouchStick : IStickInput
         pointerId = e.pointerId;
         zone.CapturePointer(pointerId);
         stick.AddToClassList("stick--active");
-
-        Vector2 local = e.localPosition;
-        if (floating)
-        {
-            float half = stick.resolvedStyle.width * 0.5f;
-            Rect bounds = zone.contentRect;
-            local.x = Mathf.Clamp(local.x, half, bounds.width - half);
-            local.y = Mathf.Clamp(local.y, half, bounds.height - half);
-            stick.style.left = local.x - half;
-            stick.style.top = local.y - half;
-            stick.style.bottom = StyleKeyword.Auto;
-            center = local;
-        }
-        else
-        {
-            center = stick.layout.center;
-        }
+        center = stick.layout.center; // stick is a child of the zone: same local space
         Track(e.localPosition);
         e.StopPropagation();
-    }
-
-    void OnMove(PointerMoveEvent e)
-    {
-        if (e.pointerId == pointerId)
-            Track(e.localPosition);
-    }
-
-    void OnUp(PointerUpEvent e)
-    {
-        if (e.pointerId == pointerId)
-            Release();
     }
 
     void Track(Vector2 local)
@@ -94,42 +71,124 @@ public sealed class TouchStick : IStickInput
         Value = Vector2.zero;
         knob.style.translate = new Translate(0, 0);
         stick.RemoveFromClassList("stick--active");
-        if (floating)
-        {
-            // Back to the USS home position.
-            stick.style.left = StyleKeyword.Null;
-            stick.style.top = StyleKeyword.Null;
-            stick.style.bottom = StyleKeyword.Null;
-        }
     }
 }
 
 /// <summary>
-/// Touch button for UI Toolkit with press / release callbacks (hold actions like fire and
-/// sprint) and its own pointer capture, so it works alongside the sticks.
+/// Touch-and-drag free look (right thumb). Drag anywhere in the zone to turn the camera; the
+/// finger's movement is accumulated and consumed once per frame by InputManager, so the
+/// result is exact and frame-rate independent (unlike a joystick, which sets a turn RATE).
+/// Other controls (e.g. the fire button) can feed drags in too via <see cref="AddDelta"/>.
+/// </summary>
+public sealed class TouchLook : ILookInput
+{
+    readonly VisualElement zone;
+    int pointerId = -1;
+    Vector2 last;
+    Vector2 accumulated;
+
+    public bool IsHeld => pointerId != -1;
+
+    /// <summary>Raised the first time the player drags (to hide the "drag to look" hint).</summary>
+    public event Action FirstDrag;
+
+    public TouchLook(VisualElement zone)
+    {
+        this.zone = zone;
+        zone.RegisterCallback<PointerDownEvent>(e =>
+        {
+            if (pointerId != -1)
+                return;
+            pointerId = e.pointerId;
+            last = e.position;
+            zone.CapturePointer(pointerId);
+            zone.AddToClassList("look-zone--active");
+            e.StopPropagation();
+        });
+        zone.RegisterCallback<PointerMoveEvent>(e =>
+        {
+            if (e.pointerId != pointerId)
+                return;
+            Vector2 p = e.position;
+            AddDelta(p - last);
+            last = p;
+        });
+        zone.RegisterCallback<PointerUpEvent>(e => { if (e.pointerId == pointerId) Release(); });
+        zone.RegisterCallback<PointerCancelEvent>(e => { if (e.pointerId == pointerId) Release(); });
+        zone.RegisterCallback<PointerCaptureOutEvent>(e => { if (e.pointerId == pointerId) Release(); });
+    }
+
+    /// <summary>Adds a drag in panel units (UI y down).</summary>
+    public void AddDelta(Vector2 uiDelta)
+    {
+        if (uiDelta == Vector2.zero)
+            return;
+        accumulated += uiDelta;
+        if (FirstDrag != null && uiDelta.sqrMagnitude > 4f)
+        {
+            FirstDrag.Invoke();
+            FirstDrag = null;
+        }
+    }
+
+    /// <summary>Drag since the last call, +y = up. Called once per frame by InputManager.</summary>
+    public Vector2 ConsumeDelta()
+    {
+        Vector2 d = accumulated;
+        accumulated = Vector2.zero;
+        return new Vector2(d.x, -d.y);
+    }
+
+    public void Release()
+    {
+        int id = pointerId;
+        pointerId = -1;
+        if (id != -1 && zone.HasPointerCapture(id))
+            zone.ReleasePointer(id);
+        accumulated = Vector2.zero;
+        zone.RemoveFromClassList("look-zone--active");
+    }
+}
+
+/// <summary>
+/// Touch button for UI Toolkit with press / release callbacks (hold actions like fire) and its
+/// own pointer capture, so it works alongside the stick and the look zone. With
+/// <c>onDrag</c>, sliding the finger while holding reports the movement (fire + aim).
 /// </summary>
 public sealed class TouchButton
 {
     readonly VisualElement element;
     readonly Action onPress, onRelease;
+    readonly Action<Vector2> onDrag;
     int pointerId = -1;
+    Vector2 last;
 
     public bool IsHeld => pointerId != -1;
 
-    public TouchButton(VisualElement element, Action onPress, Action onRelease = null)
+    public TouchButton(VisualElement element, Action onPress, Action onRelease = null, Action<Vector2> onDrag = null)
     {
         this.element = element;
         this.onPress = onPress;
         this.onRelease = onRelease;
+        this.onDrag = onDrag;
         element.RegisterCallback<PointerDownEvent>(e =>
         {
             if (pointerId != -1)
                 return;
             pointerId = e.pointerId;
+            last = e.position;
             element.CapturePointer(pointerId);
             element.AddToClassList("action--pressed");
             onPress?.Invoke();
             e.StopPropagation();
+        });
+        element.RegisterCallback<PointerMoveEvent>(e =>
+        {
+            if (e.pointerId != pointerId || onDrag == null)
+                return;
+            Vector2 p = e.position;
+            onDrag(p - last);
+            last = p;
         });
         element.RegisterCallback<PointerUpEvent>(e => { if (e.pointerId == pointerId) Release(); });
         element.RegisterCallback<PointerCancelEvent>(e => { if (e.pointerId == pointerId) Release(); });

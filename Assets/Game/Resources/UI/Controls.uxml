@@ -1,6 +1,9 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
     <Style src="Game.uss" />
     <Style src="Controls.uss" />
+    <!-- Hybrid touch controller for the LOCAL player (replaces the Player prefab's uGUI canvases).
+         Left: fixed virtual joystick (movement). Right: touch-and-drag free look (camera / aim).
+         Order matters: later elements sit on top, so buttons win over the look / stick zones. -->
     <ui:VisualElement name="controls" class="controls" picking-mode="Ignore">
 
         <!-- scope overlay (was ScopeCanvas) -->
@@ -9,7 +12,7 @@
             <ui:VisualElement class="scope__reticle" picking-mode="Ignore" />
         </ui:VisualElement>
 
-        <!-- crosshair (lines spread while moving / firing) -->
+        <!-- crosshair (spreads while moving / firing, red over enemies) -->
         <ui:VisualElement name="crosshair" class="crosshair" picking-mode="Ignore">
             <ui:VisualElement name="ch-left" class="crosshair__line crosshair__line--h" picking-mode="Ignore" />
             <ui:VisualElement name="ch-right" class="crosshair__line crosshair__line--h" picking-mode="Ignore" />
@@ -18,39 +21,50 @@
             <ui:VisualElement class="crosshair__dot" picking-mode="Ignore" />
         </ui:VisualElement>
 
-        <!-- movement: the stick appears where the thumb lands inside this zone -->
-        <ui:VisualElement name="move-zone" class="touch stick-zone">
-            <ui:VisualElement name="move-stick" class="stick stick--move" picking-mode="Ignore">
+        <!-- RIGHT: drag anywhere here to look around -->
+        <ui:VisualElement name="look-zone" class="touch look-zone">
+            <ui:VisualElement name="look-hint" class="look-hint" picking-mode="Ignore">
+                <ui:VisualElement class="look-hint__ring" picking-mode="Ignore">
+                    <ui:VisualElement class="look-hint__dot" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:Label text="DRAG TO LOOK" class="look-hint__text" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- LEFT: fixed virtual joystick; touching anywhere in the zone steers from the stick centre -->
+        <ui:VisualElement name="move-zone" class="touch move-zone">
+            <ui:VisualElement name="move-stick" class="stick" picking-mode="Ignore">
                 <ui:VisualElement class="stick__ring" picking-mode="Ignore" />
+                <ui:VisualElement class="stick__tick stick__tick--up" picking-mode="Ignore" />
+                <ui:VisualElement class="stick__tick stick__tick--down" picking-mode="Ignore" />
+                <ui:VisualElement class="stick__tick stick__tick--left" picking-mode="Ignore" />
+                <ui:VisualElement class="stick__tick stick__tick--right" picking-mode="Ignore" />
                 <ui:VisualElement name="move-knob" class="stick__knob" picking-mode="Ignore" />
             </ui:VisualElement>
+            <ui:Label name="sprint-pill" text="SPRINT" class="sprint-pill" picking-mode="Ignore" />
         </ui:VisualElement>
 
-        <!-- camera look stick (fixed, like the original) -->
-        <ui:VisualElement name="look-zone" class="touch stick-zone stick-zone--look">
-            <ui:VisualElement name="look-stick" class="stick stick--look" picking-mode="Ignore">
-                <ui:VisualElement class="stick__ring" picking-mode="Ignore" />
-                <ui:VisualElement name="look-knob" class="stick__knob" picking-mode="Ignore" />
-            </ui:VisualElement>
-        </ui:VisualElement>
-
-        <!-- actions -->
-        <ui:VisualElement name="fire-left" class="touch action action--fire action--fire-left" />
-        <ui:VisualElement name="fire-right" class="touch action action--fire action--fire-right" />
-        <ui:VisualElement name="jump" class="touch action action--jump">
-            <ui:Label text="JUMP" class="action__label" picking-mode="Ignore" />
-        </ui:VisualElement>
+        <!-- left-hand buttons -->
+        <ui:VisualElement name="fire-left" class="touch action action--fire-left" />
         <ui:VisualElement name="sprint" class="touch action action--sprint">
             <ui:Label text="SPRINT" class="action__label" picking-mode="Ignore" />
         </ui:VisualElement>
-        <ui:VisualElement name="reload" class="touch action action--reload">
-            <ui:Label text="RELOAD" class="action__label" picking-mode="Ignore" />
+
+        <!-- right-hand cluster around the main trigger -->
+        <ui:VisualElement name="jump" class="touch action action--jump">
+            <ui:Label text="JUMP" class="action__label" picking-mode="Ignore" />
         </ui:VisualElement>
         <ui:VisualElement name="aim" class="touch action action--aim">
             <ui:VisualElement class="aim-icon" picking-mode="Ignore">
                 <ui:VisualElement class="aim-icon__dot" picking-mode="Ignore" />
             </ui:VisualElement>
             <ui:Label text="AIM" class="action__label" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:VisualElement name="reload" class="touch action action--reload">
+            <ui:Label text="RELOAD" class="action__label" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:VisualElement name="fire-right" class="touch action action--fire">
+            <ui:VisualElement class="fire-ring" picking-mode="Ignore" />
         </ui:VisualElement>
 
         <!-- health (was HealthBarSlider) -->

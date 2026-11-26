@@ -1998,6 +1998,8 @@ MonoBehaviour:
   animatorManager: {fileID: 4719117576920807861}
   movementJoystick: {fileID: 8250901257332086384}
   cameraJoystick: {fileID: 2625372985044375759}
+  dragLookSensitivity: 0.09
+  autoSprintThreshold: 0.92
   verticalInput: 0
   horizontalInput: 0
   movementAmount: 0

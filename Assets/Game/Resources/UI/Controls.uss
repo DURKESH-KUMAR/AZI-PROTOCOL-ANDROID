@@ -1,5 +1,6 @@
-/* Local player's touch controls (replaces the "Health&Crosshair" and "ScopeCanvas" uGUI canvases
-   in Player.prefab). Positions match the original prefab at 1920x1080. */
+/* Hybrid touch controller for the local player (replaces "Health&Crosshair" + "ScopeCanvas"
+   in Player.prefab). Panel is 1080 tall; elements anchor to the left/right edges so they sit
+   under the thumbs on any phone width. Safe-area insets are applied by GameUI. */
 
 .controls {
     position: absolute;
@@ -9,75 +10,173 @@
     bottom: 0;
 }
 
-/* ------------------------------------------------------------ sticks */
+/* ------------------------------------------------------------ left: virtual joystick */
 
-.stick-zone {
+/* Generous activation area: touch anywhere here, the stick itself stays put. */
+.move-zone {
     position: absolute;
     left: 0;
     bottom: 0;
-    width: 780px;
-    height: 640px;
-}
-
-.stick-zone--look {
-    left: auto;
-    right: 0;
-    width: 330px;
-    height: 330px;
+    width: 640px;
+    height: 600px;
 }
 
 .stick {
     position: absolute;
-    width: 250px;
-    height: 250px;
-    border-radius: 125px;
-    border-width: 4px;
-    border-color: rgba(255, 255, 255, 0.55);
-    background-color: rgba(10, 15, 23, 0.25);
+    left: 120px;
+    bottom: 96px;
+    width: 280px;
+    height: 280px;
+    border-radius: 140px;
+    border-width: 3px;
+    border-color: rgba(255, 255, 255, 0.4);
+    background-color: rgba(10, 15, 23, 0.28);
     align-items: center;
     justify-content: center;
-    opacity: 0.75;
-    transition-property: opacity, border-color;
-    transition-duration: 0.15s, 0.15s;
-}
-
-.stick--move {
-    left: 91px;
-    bottom: 48px;
-}
-
-.stick--look {
-    right: 37px;
-    bottom: 48px;
+    opacity: 0.7;
+    transition-property: opacity, border-color, scale;
+    transition-duration: 0.15s, 0.15s, 0.15s;
 }
 
 .stick--active {
     opacity: 1;
     border-color: var(--accent);
-}
-
-.stick__knob {
-    width: 118px;
-    height: 118px;
-    border-radius: 59px;
-    background-color: rgba(255, 255, 255, 0.9);
-    border-width: 6px;
-    border-color: rgba(255, 255, 255, 0.35);
-}
-
-.stick--active .stick__knob {
-    background-color: var(--accent);
+    scale: 1.04 1.04;
 }
 
 .stick__ring {
     position: absolute;
-    left: 20px;
-    top: 20px;
-    right: 20px;
-    bottom: 20px;
-    border-radius: 105px;
+    left: 34px;
+    top: 34px;
+    right: 34px;
+    bottom: 34px;
+    border-radius: 106px;
     border-width: 1px;
-    border-color: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.14);
+}
+
+/* Direction ticks on the rim. */
+.stick__tick {
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.45);
+}
+
+.stick__tick--up {
+    top: 12px;
+    left: 136px;
+    width: 8px;
+    height: 16px;
+}
+
+.stick__tick--down {
+    bottom: 12px;
+    left: 136px;
+    width: 8px;
+    height: 16px;
+}
+
+.stick__tick--left {
+    left: 12px;
+    top: 136px;
+    width: 16px;
+    height: 8px;
+}
+
+.stick__tick--right {
+    right: 12px;
+    top: 136px;
+    width: 16px;
+    height: 8px;
+}
+
+.stick--active .stick__tick {
+    background-color: var(--accent);
+}
+
+.stick__knob {
+    width: 124px;
+    height: 124px;
+    border-radius: 62px;
+    background-color: rgba(255, 255, 255, 0.92);
+    border-width: 6px;
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.stick--active .stick__knob {
+    background-color: var(--accent);
+    border-color: rgba(255, 184, 48, 0.35);
+}
+
+.sprint-pill {
+    position: absolute;
+    left: 200px;
+    bottom: 392px;
+    width: 120px;
+    padding: 6px 0;
+    border-radius: 14px;
+    background-color: var(--accent);
+    color: #10151C;
+    font-size: 20px;
+    letter-spacing: 2px;
+    -unity-text-align: middle-center;
+    text-shadow: 0 0 0 rgba(0, 0, 0, 0);
+    opacity: 0;
+    translate: 0 10px;
+    transition-property: opacity, translate;
+    transition-duration: 0.15s, 0.15s;
+}
+
+.sprint-pill--on {
+    opacity: 1;
+    translate: 0 0;
+}
+
+/* ------------------------------------------------------------ right: free look */
+
+.look-zone {
+    position: absolute;
+    left: 45%;
+    right: 0;
+    top: 170px; /* leave the top strip free for the scene's home button */
+    bottom: 0;
+}
+
+.look-hint {
+    position: absolute;
+    left: 38%;
+    top: 30%;
+    align-items: center;
+    opacity: 0.55;
+    transition-property: opacity;
+    transition-duration: 0.6s;
+}
+
+.look-hint--gone {
+    opacity: 0;
+}
+
+.look-hint__ring {
+    width: 96px;
+    height: 96px;
+    border-radius: 48px;
+    border-width: 3px;
+    border-color: rgba(255, 255, 255, 0.6);
+    align-items: center;
+    justify-content: center;
+}
+
+.look-hint__dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 11px;
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+.look-hint__text {
+    margin-top: 12px;
+    font-size: 22px;
+    letter-spacing: 3px;
+    color: rgba(255, 255, 255, 0.8);
 }
 
 /* ------------------------------------------------------------ action buttons */
@@ -89,8 +188,10 @@
     border-width: 3px;
     border-color: rgba(255, 255, 255, 0.5);
     -unity-background-scale-mode: scale-to-fit;
-    transition-property: scale, border-color, background-color;
-    transition-duration: 0.07s, 0.1s, 0.1s;
+    align-items: center;
+    justify-content: center;
+    transition-property: scale, border-color, background-color, opacity;
+    transition-duration: 0.07s, 0.1s, 0.1s, 0.15s;
 }
 
 .action--pressed {
@@ -104,70 +205,94 @@
     background-color: rgba(255, 184, 48, 0.35);
 }
 
-.action__label {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -32px;
-    font-size: 20px;
-    letter-spacing: 2px;
-    -unity-text-align: middle-center;
-    color: rgba(255, 255, 255, 0.75);
+.action--disabled {
+    opacity: 0.35;
 }
 
+.action__label {
+    position: absolute;
+    left: -20px;
+    right: -20px;
+    bottom: -30px;
+    font-size: 19px;
+    letter-spacing: 2px;
+    -unity-text-align: middle-center;
+    color: rgba(255, 255, 255, 0.78);
+}
+
+/* Main trigger: biggest target, bottom-right under the right thumb. */
 .action--fire {
-    width: 150px;
-    height: 150px;
-    bottom: 74px;
+    width: 184px;
+    height: 184px;
+    right: 128px;
+    bottom: 104px;
+    border-width: 4px;
     background-image: url("/Assets/Icon/Untitled_design__1_-removebg-preview.png");
 }
 
-.action--fire-right {
-    right: 320px;
+.fire-ring {
+    position: absolute;
+    left: -14px;
+    top: -14px;
+    right: -14px;
+    bottom: -14px;
+    border-radius: 999px;
+    border-width: 2px;
+    border-color: rgba(255, 184, 48, 0);
+    transition-property: border-color, scale;
+    transition-duration: 0.12s, 0.12s;
 }
 
+.action--pressed .fire-ring {
+    border-color: rgba(255, 184, 48, 0.8);
+    scale: 1.08 1.08;
+}
+
+/* Secondary trigger for left-thumb firing while turning with the right. */
 .action--fire-left {
-    left: 366px;
+    width: 128px;
+    height: 128px;
+    left: 470px;
+    bottom: 112px;
+    background-image: url("/Assets/Icon/Untitled_design__1_-removebg-preview.png");
 }
 
 .action--sprint {
-    width: 125px;
-    height: 125px;
-    right: 100px;
-    bottom: 321px;
+    width: 104px;
+    height: 104px;
+    left: 452px;
+    bottom: 330px;
     background-image: url("/Assets/Icon/Untitled_design__4_-removebg-preview.png");
 }
 
 .action--jump {
-    width: 125px;
-    height: 125px;
-    left: 142px;
-    bottom: 314px;
+    width: 118px;
+    height: 118px;
+    right: 58px;
+    bottom: 352px;
     background-image: url("/Assets/Icon/Untitled_design__2_-removebg-preview.png");
 }
 
-.action--reload {
-    width: 112px;
-    height: 112px;
-    right: 340px;
-    bottom: 280px;
-    background-image: url("/Assets/Icon/Untitled_design__3_-removebg-preview.png");
+.action--aim {
+    width: 118px;
+    height: 118px;
+    right: 352px;
+    bottom: 262px;
 }
 
-.action--aim {
-    width: 112px;
-    height: 112px;
-    right: 112px;
-    bottom: 500px;
-    align-items: center;
-    justify-content: center;
+.action--reload {
+    width: 104px;
+    height: 104px;
+    right: 384px;
+    bottom: 84px;
+    background-image: url("/Assets/Icon/Untitled_design__3_-removebg-preview.png");
 }
 
 /* Aim icon drawn with USS: a ring with a dot. */
 .aim-icon {
-    width: 54px;
-    height: 54px;
-    border-radius: 27px;
+    width: 56px;
+    height: 56px;
+    border-radius: 28px;
     border-width: 4px;
     border-color: #FFFFFF;
     align-items: center;
@@ -179,10 +304,6 @@
     height: 10px;
     border-radius: 5px;
     background-color: #FFFFFF;
-}
-
-.action--disabled {
-    opacity: 0.35;
 }
 
 /* ------------------------------------------------------------ health */
@@ -198,7 +319,7 @@
 }
 
 .health__icon {
-    font-size: 26px;
+    font-size: 24px;
     color: var(--muted);
     margin-right: 12px;
 }
@@ -233,7 +354,7 @@
 
 .health__value {
     width: 90px;
-    font-size: 30px;
+    font-size: 28px;
     -unity-text-align: middle-right;
 }
 
@@ -325,13 +446,14 @@
     -unity-background-scale-mode: scale-to-fit;
 }
 
-/* While aiming: keep the sticks, fire and aim; fade the rest. */
+/* While aiming: keep stick, look, fire and aim; fade the rest. */
 .controls--scoped .action--jump,
 .controls--scoped .action--sprint,
 .controls--scoped .action--reload {
     opacity: 0.25;
 }
 
-.controls--scoped .crosshair {
+.controls--scoped .crosshair,
+.controls--scoped .look-hint {
     display: none;
 }

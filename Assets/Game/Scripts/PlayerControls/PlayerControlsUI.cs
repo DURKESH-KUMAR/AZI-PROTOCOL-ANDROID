@@ -4,7 +4,8 @@ using UnityEngine.UIElements;
 /// <summary>
 /// UI Toolkit version of the Player prefab's screen UI (Resources/UI/Controls.uxml + Controls.uss),
 /// replacing the "Health&amp;Crosshair" and "ScopeCanvas" uGUI canvases for the LOCAL player:
-/// multi-touch sticks (floating move stick), fire x2, jump, sprint (hold), reload and aim (new),
+/// hybrid touch controller - fixed virtual joystick (left), touch-and-drag free look (right),
+/// fire x2 (main trigger also drags to aim), jump, sprint lock, reload and aim,
 /// health bar with damage trail, dynamic crosshair (spreads when moving/firing, turns red on
 /// enemies) and a scope overlay. Added by PlayerManager; remote players never get it.
 /// If the UXML is missing, the original uGUI canvas simply stays in use.
@@ -22,7 +23,10 @@ public class PlayerControlsUI : MonoBehaviour
 
     VisualElement root, controls, scope, crosshair, chLeft, chRight, chUp, chDown, health, healthFill, healthTrail, aim, reload;
     Label healthValue;
-    TouchStick moveStick, lookStick;
+    TouchStick moveStick;
+    TouchLook look;
+    VisualElement sprintButton, sprintPill, lookHint;
+    bool shownSprinting, shownSprintLock;
     TouchButton[] buttons;
 
     float spread, shownSpread = -1f;
@@ -69,17 +73,25 @@ public class PlayerControlsUI : MonoBehaviour
         aim = root.Q("aim");
         reload = root.Q("reload");
 
-        moveStick = new TouchStick(root.Q("move-zone"), root.Q("move-stick"), root.Q("move-knob"), floating: true);
-        lookStick = new TouchStick(root.Q("look-zone"), root.Q("look-stick"), root.Q("look-knob"), floating: false);
+        sprintButton = root.Q("sprint");
+        sprintPill = root.Q("sprint-pill");
+        lookHint = root.Q("look-hint");
+
+        // Left: fixed virtual joystick. Right: touch-and-drag free look.
+        moveStick = new TouchStick(root.Q("move-zone"), root.Q("move-stick"), root.Q("move-knob"));
+        look = new TouchLook(root.Q("look-zone"));
+        look.FirstDrag += () => lookHint.AddToClassList("look-hint--gone");
         input.moveStick = moveStick;
-        input.lookStick = lookStick;
+        input.lookDrag = look;
 
         buttons = new[]
         {
             new TouchButton(root.Q("fire-left"), input.OnFirePressed, input.OnFireReleased),
-            new TouchButton(root.Q("fire-right"), input.OnFirePressed, input.OnFireReleased),
+            // Main trigger: hold to fire and slide the thumb to keep aiming (fire + look).
+            new TouchButton(root.Q("fire-right"), input.OnFirePressed, input.OnFireReleased, look.AddDelta),
             new TouchButton(root.Q("jump"), input.OnJumpPressed),
-            new TouchButton(root.Q("sprint"), input.OnSprintPressed, input.OnSprintReleased),
+            // Tap to lock sprint on/off (also: push the stick to the top edge).
+            new TouchButton(sprintButton, () => input.sprintInput = !input.sprintInput),
             new TouchButton(reload, input.OnReloadPressed),
             new TouchButton(aim, input.ToggleScope),
         };
@@ -112,14 +124,15 @@ public class PlayerControlsUI : MonoBehaviour
         if (input != null)
         {
             input.moveStick = null;
-            input.lookStick = null;
+            input.lookDrag = null;
         }
     }
 
     void ReleaseAll()
     {
         moveStick.Release();
-        lookStick.Release();
+        look.Release();
+        input.sprintInput = false;
         for (int i = 0; i < buttons.Length; i++)
             buttons[i].Release();
     }
@@ -137,7 +150,7 @@ public class PlayerControlsUI : MonoBehaviour
         if (dead)
             return;
 
-        if (PlayerManager.InputBlocked && (moveStick.IsHeld || lookStick.IsHeld))
+        if (PlayerManager.InputBlocked && (moveStick.IsHeld || look.IsHeld))
             ReleaseAll(); // pause menu opened mid-touch
 
         UpdateScope();
@@ -158,6 +171,21 @@ public class PlayerControlsUI : MonoBehaviour
 
     void UpdateButtons()
     {
+        // Sprint lock ends when the player lets go of the stick.
+        if (input.sprintInput && !moveStick.IsHeld)
+            input.sprintInput = false;
+        if (input.sprintInput != shownSprintLock)
+        {
+            shownSprintLock = input.sprintInput;
+            sprintButton.EnableInClassList("action--on", shownSprintLock);
+        }
+        bool sprinting = movement.isSprinting;
+        if (sprinting != shownSprinting)
+        {
+            shownSprinting = sprinting;
+            sprintPill.EnableInClassList("sprint-pill--on", sprinting);
+        }
+
         bool aimOn = input.scopeInput;
         if (aimOn != shownAimOn)
         {
