@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using Photon.Pun;
 
@@ -6,9 +7,11 @@ public class ShootingController : MonoBehaviour
     Animator animator;
     InputManager inputManager;
     PlayerMovement playerMovement;
+
     [Header("Shooting Var")]
     public Transform firePoint;
-    public float fireRate = 0.1f;
+    [Tooltip("Shots per second (5 = one shot every 0.2s).")]
+    public float fireRate = 5f;
     public float fireRange = 100f;
     public float fireDamage = 15;
     private float nextFireTime = 0f;
@@ -33,147 +36,170 @@ public class ShootingController : MonoBehaviour
     [Header("Particle Effects")]
     public ParticleSystem muzzleFlash;
     public ParticleSystem bloodEffect;
-    PhotonView view;
-    public int playerTeam;
 
-    void Start()
+    PhotonView view;
+    Coroutine reloadRoutine;
+    bool reloadUsedShootTrigger;
+
+    static readonly int ShootHash = Animator.StringToHash("Shoot");
+    static readonly int ShootingMovementHash = Animator.StringToHash("ShootingMovement");
+    static readonly int ShootWalkHash = Animator.StringToHash("ShootWalk");
+    static readonly int ReloadHash = Animator.StringToHash("Reload");
+    static readonly int ShootReloadHash = Animator.StringToHash("ShootReload");
+
+    /// <summary>Team of this player (live from Photon properties).</summary>
+    public int playerTeam => playerMovement != null ? playerMovement.playerTeam : 0;
+
+    void Awake()
     {
-        view=GetComponent<PhotonView>();
+        view = GetComponent<PhotonView>();
         animator = GetComponent<Animator>();
         inputManager = GetComponent<InputManager>();
         playerMovement = GetComponent<PlayerMovement>();
         currentAmmo = maxAmmo;
-        if (view.Owner.CustomProperties.ContainsKey("Team"))
+    }
+
+    void OnDisable()
+    {
+        // Don't leave a pending reload running on a disabled/destroyed player.
+        if (reloadRoutine != null)
         {
-            int team=(int)view.Owner.CustomProperties["Team"];
-            playerTeam=team;
+            StopCoroutine(reloadRoutine);
+            reloadRoutine = null;
+            isReloading = false;
         }
     }
+
     void Update()
     {
-        if(!view.IsMine)
+        if (!view.IsMine)
             return;
+
+        // One-shot input: always consume it so a single press can't trigger reloads forever.
+        bool reloadPressed = inputManager.ConsumeReloadInput();
+
         if (isReloading || playerMovement.isSprinting)
         {
-            animator.SetBool("Shoot", false);
-            animator.SetBool("ShootingMovement", false);
-            animator.SetBool("ShootWalk", false);
+            SetShootAnim(false, false, false);
+            isShooting = false;
             return;
         }
+
         isWalking = playerMovement.isMoving;
         isShootingInput = inputManager.fireInput;
-        isScopeInput=inputManager.scopeInput;
-        if (isShootingInput && isWalking)
-        {
-            if (Time.time >= nextFireTime)
-            {
-                nextFireTime = Time.time + 1f / fireRate;
-                Shoot();
-                animator.SetBool("ShootWalk", true);
+        isScopeInput = inputManager.scopeInput;
 
-            }
-            animator.SetBool("Shoot", false);
-            animator.SetBool("ShootingMovement", true);
+        if (isShootingInput)
+        {
+            TryShoot();
+            if (isWalking)
+                SetShootAnim(false, true, true);
+            else
+                SetShootAnim(true, false, false);
             isShooting = true;
         }
-        else if (isShootingInput)
+        else if (isScopeInput)
         {
-            if (Time.time >= nextFireTime)
-            {
-                nextFireTime = Time.time + 1f / fireRate;
-                Shoot();
-
-
-            }
-            animator.SetBool("Shoot", true);
-            animator.SetBool("ShootWalk", false);
-            animator.SetBool("ShootingMovement", false);
-            isShooting = true;
-
-
-        }else if (isScopeInput)
-        {
-            animator.SetBool("Shoot", false);
-            animator.SetBool("ShootWalk", false);
-            animator.SetBool("ShootingMovement", true);
-            isShooting = false;            
-        }
-        else
-        {
-            animator.SetBool("Shoot", false);
-            animator.SetBool("ShootingMovement", false);
-            animator.SetBool("ShootWalk", false);
+            SetShootAnim(false, true, false);
             isShooting = false;
         }
-        if (inputManager.reloadInput && currentAmmo < maxAmmo)
+        else
         {
-            Reload();
+            SetShootAnim(false, false, false);
+            isShooting = false;
         }
+
+        if (reloadPressed && currentAmmo < maxAmmo)
+            Reload();
     }
+
+    void SetShootAnim(bool shoot, bool shootingMovement, bool shootWalk)
+    {
+        animator.SetBool(ShootHash, shoot);
+        animator.SetBool(ShootingMovementHash, shootingMovement);
+        animator.SetBool(ShootWalkHash, shootWalk);
+    }
+
+    void TryShoot()
+    {
+        if (Time.time < nextFireTime)
+            return;
+        nextFireTime = Time.time + 1f / Mathf.Max(0.01f, fireRate);
+        Shoot();
+    }
+
     private void Shoot()
     {
-        if (currentAmmo > 0)
-        {
-            RaycastHit hit;
-            if (Physics.Raycast(firePoint.position, firePoint.forward, out hit, fireRange))
-            {
-                Debug.Log(hit.transform.name);
-                Vector3 hitPoint=hit.point;
-                Vector3 hitNormal=hit.normal;
-                PlayerMovement playermovementDamage=hit.collider.GetComponent<PlayerMovement>();
-                if (playermovementDamage != null && playermovementDamage.playerTeam!=playerTeam)
-                {
-                    playermovementDamage.ApplyDamage(fireDamage);
-                    view.RPC("RPC_Shoot",RpcTarget.All,hitPoint,hitNormal);
-                }
-            }
-            muzzleFlash.Play();
-            soundAudioSource.PlayOneShot(shootingSoundClip);
-            currentAmmo--;
-        }
-        else
+        if (currentAmmo <= 0)
         {
             Reload();
-
+            return;
         }
 
+        currentAmmo--;
+        bool hitEnemy = false;
+        Vector3 hitPoint = Vector3.zero;
+        Vector3 hitNormal = Vector3.up;
+
+        if (Physics.Raycast(firePoint.position, firePoint.forward, out RaycastHit hit, fireRange, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+        {
+            // Collider may be on a child bone/mesh, so search upwards.
+            PlayerMovement target = hit.collider.GetComponentInParent<PlayerMovement>();
+            if (target != null && target != playerMovement && target.playerTeam != playerTeam)
+            {
+                target.ApplyDamage(fireDamage);
+                hitEnemy = true;
+                hitPoint = hit.point;
+                hitNormal = hit.normal;
+            }
+        }
+
+        // Local feedback immediately, everyone else via RPC (they previously never saw/heard shots).
+        PlayShotEffects(hitEnemy, hitPoint, hitNormal);
+        view.RPC(nameof(RPC_Shoot), RpcTarget.Others, hitEnemy, hitPoint, hitNormal);
     }
+
     [PunRPC]
-    void RPC_Shoot(Vector3 hitPoint,Vector3 hitNormal)
+    void RPC_Shoot(bool hitEnemy, Vector3 hitPoint, Vector3 hitNormal)
     {
-        ParticleSystem blood=Instantiate(bloodEffect,hitPoint,Quaternion.LookRotation(hitNormal));
-        Destroy(blood.gameObject,blood.main.duration);
-        
+        PlayShotEffects(hitEnemy, hitPoint, hitNormal);
     }
+
+    void PlayShotEffects(bool hitEnemy, Vector3 hitPoint, Vector3 hitNormal)
+    {
+        if (muzzleFlash != null)
+            muzzleFlash.Play();
+        if (soundAudioSource != null && shootingSoundClip != null)
+            soundAudioSource.PlayOneShot(shootingSoundClip);
+
+        if (hitEnemy && bloodEffect != null)
+        {
+            ParticleSystem blood = Instantiate(bloodEffect, hitPoint, Quaternion.LookRotation(hitNormal));
+            ParticleSystem.MainModule main = blood.main;
+            // Destroy after the last particle can have died, so the effect is always cleaned up.
+            Destroy(blood.gameObject, main.duration + main.startLifetime.constantMax);
+        }
+    }
+
     private void Reload()
     {
-        if (!isReloading && currentAmmo < maxAmmo)
-        {
-            if (isShootingInput && isWalking)
-            {
-                animator.SetTrigger("ShootReload");
+        if (isReloading || currentAmmo >= maxAmmo)
+            return;
 
-            }
-            else
-            {
-                animator.SetTrigger("Reload");
-            }
-            isReloading = true;
+        reloadUsedShootTrigger = isShootingInput && isWalking;
+        animator.SetTrigger(reloadUsedShootTrigger ? ShootReloadHash : ReloadHash);
+        isReloading = true;
+        if (soundAudioSource != null && reloadingSoundClip != null)
             soundAudioSource.PlayOneShot(reloadingSoundClip);
-            Invoke("FinishReloading",reloadTime);
-        }
+        reloadRoutine = StartCoroutine(FinishReloadingAfterDelay());
     }
-    private void FinishReloading()
+
+    IEnumerator FinishReloadingAfterDelay()
     {
+        yield return new WaitForSeconds(reloadTime);
         currentAmmo = maxAmmo;
         isReloading = false;
-        if (isShootingInput && isWalking)
-        {
-            animator.ResetTrigger("ShootReload");
-        }
-        else
-        {
-            animator.ResetTrigger("Reload");
-        }
+        reloadRoutine = null;
+        animator.ResetTrigger(reloadUsedShootTrigger ? ShootReloadHash : ReloadHash);
     }
 }

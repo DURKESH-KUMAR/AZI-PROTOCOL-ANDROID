@@ -3,76 +3,43 @@ using UnityEngine;
 public class AnimatorManager : MonoBehaviour
 {
     public Animator animator;
-    int horizontalValue;
-    int verticalValue;
+
+    static readonly int HorizontalHash = Animator.StringToHash("Horizontal");
+    static readonly int VerticalHash = Animator.StringToHash("Vertical");
+    static readonly int IsInteractingHash = Animator.StringToHash("isInteracting");
+    public static readonly int IsJumpingHash = Animator.StringToHash("isJumping");
+
     void Awake()
     {
         animator = GetComponent<Animator>();
-        horizontalValue = Animator.StringToHash("Horizontal");
-        verticalValue = Animator.StringToHash("Vertical");
     }
+
+    static float Snap(float value)
+    {
+        float abs = Mathf.Abs(value);
+        if (abs <= 0f) return 0f;
+        float snapped = abs < 0.55f ? 0.5f : 1f;
+        return value > 0f ? snapped : -snapped;
+    }
+
     public void ChangeAnimatorValues(float horizontalMovement, float verticalMovement, bool isSprinting)
     {
-        float snappedHorizontalMovement;
-        float snappedVerticalMovement;
-
-        #region Snapped Horizontal
-        if (horizontalMovement > 0 && horizontalMovement < 0.55f)
-        {
-            snappedHorizontalMovement = 0.5f;
-        }
-        else if (horizontalMovement > 0.55f)
-        {
-            snappedHorizontalMovement = 1f;
-        }
-        else if (horizontalMovement < 0 && horizontalMovement > -0.55f)
-        {
-            snappedHorizontalMovement = -0.55f;
-        }
-        else if (horizontalMovement < -0.55f)
-        {
-            snappedHorizontalMovement = -1f;
-        }
-        else
-        {
-            snappedHorizontalMovement = 0f;
-        }
-        #endregion
-
-        #region Snapped Vertical
-        if (verticalMovement > 0 && verticalMovement < 0.55f)
-        {
-            snappedVerticalMovement = 0.5f;
-        }
-        else if (verticalMovement > 0.55f)
-        {
-            snappedVerticalMovement = 1f;
-        }
-        else if (verticalMovement < 0 && verticalMovement > -0.55f)
-        {
-            snappedVerticalMovement = -0.55f;
-        }
-        else if (verticalMovement < -0.55f)
-        {
-            snappedVerticalMovement = -1f;
-        }
-        else
-        {
-            snappedVerticalMovement = 0f;
-        }
-        #endregion
+        float snappedHorizontalMovement = Snap(horizontalMovement);
+        float snappedVerticalMovement = Snap(verticalMovement);
 
         if (isSprinting)
         {
             snappedHorizontalMovement = horizontalMovement;
-            snappedVerticalMovement = 2;
+            snappedVerticalMovement = 2f;
         }
-        animator.SetFloat(horizontalValue, snappedHorizontalMovement, 0.1f, Time.deltaTime);
-        animator.SetFloat(verticalValue, snappedVerticalMovement, 0.1f, Time.deltaTime);
+
+        animator.SetFloat(HorizontalHash, snappedHorizontalMovement, 0.1f, Time.deltaTime);
+        animator.SetFloat(VerticalHash, snappedVerticalMovement, 0.1f, Time.deltaTime);
     }
-    public void PlayTargetAnim(string targerAnim, bool isInteracting)
+
+    public void PlayTargetAnim(string targetAnim, bool isInteracting)
     {
-        animator.SetBool("isInteracting", isInteracting);
-        animator.CrossFade(targerAnim, 0.2f);
+        animator.SetBool(IsInteractingHash, isInteracting);
+        animator.CrossFade(targetAnim, 0.2f);
     }
 }

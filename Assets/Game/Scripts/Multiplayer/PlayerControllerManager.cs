@@ -1,92 +1,89 @@
-using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
-using Photon.Pun;
 using System.IO;
-using UnityEngine.Video;
-using Photon.Realtime;
-using UnityEngine.UI;
-using System.Linq;
-using Hashtable=ExitGames.Client.Photon.Hashtable;
+using UnityEngine;
+using Photon.Pun;
 
-public class PlayerControllerManager : MonoBehaviourPunCallbacks
+public class PlayerControllerManager : MonoBehaviour
 {
+    [SerializeField] float respawnDelay = 3f;
+
     PhotonView view;
     GameObject controller;
     public int playerTeam;
-    private Dictionary<int,int> playerTeams=new Dictionary<int, int>();
+
+    Transform spawnArea1;
+    Transform spawnArea2;
+    bool respawning;
+
     void Awake()
     {
-        view=GetComponent<PhotonView>();
+        view = GetComponent<PhotonView>();
     }
+
     void Start()
     {
         if (view.IsMine)
-        {
             CreateController();
-        }
-        
     }
+
     void CreateController()
     {
-        if (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("Team"))
+        playerTeam = PlayerTeams.GetTeam(PhotonNetwork.LocalPlayer);
+        if (playerTeam == 0)
         {
-            playerTeam=(int)PhotonNetwork.LocalPlayer.CustomProperties["Team"];
-            Debug.Log("Player's Team "+playerTeam);
+            // Should not happen (master assigns in the lobby), but never leave a player unspawned.
+            playerTeam = PhotonNetwork.LocalPlayer.ActorNumber % 2 == 1 ? 1 : 2;
+            Debug.LogWarning("No team property found, falling back to team " + playerTeam);
         }
-        AssignPlayerToSpawnArea(playerTeam);
+        SpawnInTeamArea(playerTeam);
     }
-    void AssignPlayerToSpawnArea(int team)
+
+    void SpawnInTeamArea(int team)
     {
-        GameObject spawnArea1=GameObject.Find("SpawnArea1");
-        GameObject spawnArea2=GameObject.Find("SpawnArea2");
         if (spawnArea1 == null || spawnArea2 == null)
         {
-            Debug.LogError("Spawn area not found");
+            GameObject a1 = GameObject.Find("SpawnArea1");
+            GameObject a2 = GameObject.Find("SpawnArea2");
+            if (a1 == null || a2 == null)
+            {
+                Debug.LogError("Spawn area not found");
+                return;
+            }
+            spawnArea1 = a1.transform;
+            spawnArea2 = a2.transform;
+        }
+
+        Transform area = team == 2 ? spawnArea2 : spawnArea1;
+        if (area.childCount == 0)
+        {
+            Debug.LogError("No available spawn points for team: " + team);
             return;
         }
-        Transform spawnPoint=null;
-        if (team == 1)
-        {
-            spawnPoint=spawnArea1.transform.GetChild(Random.Range(0,spawnArea1.transform.childCount));
 
-        }
-        if (team == 2)
-        {
-            spawnPoint=spawnArea2.transform.GetChild(Random.Range(0,spawnArea2.transform.childCount));
-            
-        }
-        if (spawnPoint != null)
-        {
-            controller=PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs","Player"),spawnPoint.position,spawnPoint.rotation,0,new object[]{view.ViewID}); 
-            Debug.Log("Instantiated player controller at spawn point");
-        }
-        else
-        {
-            Debug.LogError("No available spawn points for team :"+team);
-        } 
+        Transform spawnPoint = area.GetChild(Random.Range(0, area.childCount));
+        controller = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "Player"),
+            spawnPoint.position, spawnPoint.rotation, 0, new object[] { view.ViewID });
     }
-    void AssignTeamsToAllPlayers()
-    {
-        foreach(Photon.Realtime.Player player in PhotonNetwork.PlayerList)
-        {
-            if (player.CustomProperties.ContainsKey("Team"))
-            {
-                int team=(int)player.CustomProperties["Team"];
-                playerTeams[player.ActorNumber]=team;
-                Debug.Log(player.NickName+"'s Team: "+team);
-                AssignPlayerToSpawnArea(team);
-            }
-        }
-    }
+
     public void Die()
     {
-        PhotonNetwork.Destroy(controller);
-        CreateController();
-    }
-    public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer)
-    {
-        AssignTeamsToAllPlayers();
+        if (respawning)
+            return;
 
+        if (controller != null)
+        {
+            PhotonNetwork.Destroy(controller);
+            controller = null;
+        }
+        StartCoroutine(RespawnAfterDelay());
+    }
+
+    IEnumerator RespawnAfterDelay()
+    {
+        respawning = true;
+        yield return new WaitForSeconds(respawnDelay);
+        respawning = false;
+        if (view.IsMine && PhotonNetwork.InRoom)
+            CreateController();
     }
 }

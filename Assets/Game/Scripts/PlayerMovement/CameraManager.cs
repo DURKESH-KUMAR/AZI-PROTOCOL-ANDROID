@@ -1,13 +1,19 @@
-using System;
 using UnityEngine;
 
+/// <summary>
+/// Third-person camera for the LOCAL player. Lives inside the Player prefab
+/// (Player > CameraManager > CameraPivot > Main Camera). All references are resolved
+/// from this player's own hierarchy - never FindObjectOfType, which would grab another
+/// player's components in multiplayer. Driven by PlayerManager.LateUpdate.
+/// </summary>
 public class CameraManager : MonoBehaviour
 {
     private InputManager inputManager;
+    private PlayerMovement playerMovement;
 
     [Header("Camera References")]
-    public Transform cameraTransform;   // The main camera
-    public Transform cameraPivot;       // The pivot point (child of player)
+    public Transform cameraTransform;   // The camera
+    public Transform cameraPivot;       // The pivot point (child of this object)
     public Transform playerTransform;   // The player target
 
     private Vector3 cameraFollowVelocity = Vector3.zero;
@@ -30,43 +36,60 @@ public class CameraManager : MonoBehaviour
     public float minCollisionOffset = 0.2f;
     public float cameraCollisionRadius = 0.2f;
     private Vector3 cameraVectorPosition;
-    private PlayerMovement playerMovement;
+
     [Header("Scope")]
     public GameObject scopeCanvas;
     public GameObject playerUI;
     public Camera mainCamera;
-    private bool isScoped=false;
-    private float orginalFOV=60f;
+    public float scopedFOV = 10f;
+    private bool isScoped;
+    private float originalFOV = 60f;
 
     void Awake()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-        playerMovement=FindObjectOfType<PlayerMovement>();
-        inputManager = FindObjectOfType<InputManager>();
-        PlayerManager player = FindObjectOfType<PlayerManager>();
-
-        if (Camera.main != null)
-            cameraTransform = Camera.main.transform;
+        PlayerManager player = GetComponentInParent<PlayerManager>();
+        if (player != null)
+        {
+            playerTransform = player.transform;
+            inputManager = player.GetComponent<InputManager>();
+            playerMovement = player.GetComponent<PlayerMovement>();
+        }
         else
-            Debug.LogError("Main Camera not found! Please tag your camera as MainCamera.");
+        {
+            Debug.LogError("CameraManager must be a child of the Player (PlayerManager) object.");
+        }
+
+        if (mainCamera == null)
+            mainCamera = GetComponentInChildren<Camera>(true);
+
+        if (mainCamera != null)
+        {
+            cameraTransform = mainCamera.transform;
+            originalFOV = mainCamera.fieldOfView;
+        }
+        else
+        {
+            Debug.LogError("No Camera found under CameraManager.");
+        }
 
         if (cameraTransform != null)
             defaultPosition = cameraTransform.localPosition.z;
 
-        if (player != null)
-            playerTransform = player.transform;
-        else
-            Debug.LogError("PlayerManager not found in the scene!");
+        if (playerTransform != null)
+            lookAngle = playerTransform.eulerAngles.y;
     }
 
-    void LateUpdate()
+    void Start()
     {
-        HandleAllCameraMovement();
+        // Initial scope/UI state (only applied again when it changes).
+        ApplyScope(false);
     }
 
     public void HandleAllCameraMovement()
     {
+        if (playerTransform == null || cameraTransform == null)
+            return;
+
         FollowTarget();
         RotateCamera();
         CameraCollision();
@@ -75,68 +98,45 @@ public class CameraManager : MonoBehaviour
 
     private void FollowTarget()
     {
-        if (playerTransform == null) return;
-
-        Vector3 targetPosition = Vector3.SmoothDamp(
+        transform.position = Vector3.SmoothDamp(
             transform.position,
             playerTransform.position,
             ref cameraFollowVelocity,
-            cameraFollowSpeed
-        );
-
-        transform.position = targetPosition;
+            cameraFollowSpeed);
     }
 
     private void RotateCamera()
     {
-        if (inputManager == null) return; // Safety check
-
-        Vector3 rotation;
-        Quaternion targetRotation;
+        if (inputManager == null) return;
 
         // Horizontal (Yaw)
         lookAngle += inputManager.cameraInputX * camLookSpeed;
 
-        // Vertical (Pitch)
-        pivotAngle -= inputManager.cameraInputY * camPivotSpeed; // inverted Y
+        // Vertical (Pitch) - inverted Y
+        pivotAngle -= inputManager.cameraInputY * camPivotSpeed;
         pivotAngle = Mathf.Clamp(pivotAngle, minPivotAngle, maxPivotAngle);
 
-        // Apply yaw to root
-        rotation = Vector3.zero;
-        rotation.y = lookAngle;
-        targetRotation = Quaternion.Euler(rotation);
-        transform.rotation = targetRotation;
+        transform.rotation = Quaternion.Euler(0f, lookAngle, 0f);
+        cameraPivot.localRotation = Quaternion.Euler(pivotAngle, 0f, 0f);
 
-        // Apply pitch to pivot
-        rotation = Vector3.zero;
-        rotation.x = pivotAngle;
-        targetRotation = Quaternion.Euler(rotation);
-        cameraPivot.localRotation = targetRotation;
-
-        if (playerMovement.isMoving == false && playerMovement.isSprinting == false)
-        {
-            playerTransform.rotation=Quaternion.Euler(0,lookAngle,0);
-        }
+        if (playerMovement != null && !playerMovement.isMoving && !playerMovement.isSprinting)
+            playerTransform.rotation = Quaternion.Euler(0f, lookAngle, 0f);
     }
 
     private void CameraCollision()
     {
         float targetPosition = defaultPosition;
-        RaycastHit hit;
-        Vector3 direction = cameraTransform.position - cameraPivot.position;
-        direction.Normalize();
+        Vector3 direction = (cameraTransform.position - cameraPivot.position).normalized;
 
-        // Sphere cast to detect environment collisions
         if (Physics.SphereCast(
             cameraPivot.position,
             cameraCollisionRadius,
             direction,
-            out hit,
+            out RaycastHit hit,
             Mathf.Abs(targetPosition),
             collisionLayer,
             QueryTriggerInteraction.Ignore))
         {
-            // Ignore player itself
             if (!hit.collider.CompareTag("Player"))
             {
                 float distance = Vector3.Distance(cameraPivot.position, hit.point);
@@ -144,28 +144,26 @@ public class CameraManager : MonoBehaviour
             }
         }
 
-        // Prevent camera from clipping too close
         if (Mathf.Abs(targetPosition) < minCollisionOffset)
             targetPosition = -minCollisionOffset;
 
-        // Smooth movement on Z-axis
         cameraVectorPosition = cameraTransform.localPosition;
         cameraVectorPosition.z = Mathf.Lerp(cameraTransform.localPosition.z, targetPosition, 0.2f);
         cameraTransform.localPosition = cameraVectorPosition;
     }
+
     public void isPlayerScoped()
     {
-        if (inputManager.scopeInput)
-        {
-            scopeCanvas.SetActive(true);
-            playerUI.SetActive(false);
-            mainCamera.fieldOfView=10f;
-        }
-        else
-        {
-            scopeCanvas.SetActive(false);
-            playerUI.SetActive(true);
-            mainCamera.fieldOfView=orginalFOV;
-        }
+        bool wantScope = inputManager != null && inputManager.scopeInput;
+        if (wantScope != isScoped)
+            ApplyScope(wantScope);
+    }
+
+    private void ApplyScope(bool scoped)
+    {
+        isScoped = scoped;
+        if (scopeCanvas != null) scopeCanvas.SetActive(scoped);
+        if (playerUI != null) playerUI.SetActive(!scoped);
+        if (mainCamera != null) mainCamera.fieldOfView = scoped ? scopedFOV : originalFOV;
     }
 }

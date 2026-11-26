@@ -1,14 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
 using UnityEngine.SceneManagement;
+using Photon.Pun;
 using System.IO;
-
 
 public class RoomManager : MonoBehaviourPunCallbacks
 {
     public static RoomManager instance;
+
+    [SerializeField] int gameSceneIndex = 3;
+
     void Awake()
     {
         if (instance)
@@ -17,25 +17,32 @@ public class RoomManager : MonoBehaviourPunCallbacks
             return;
         }
         DontDestroyOnLoad(gameObject);
-        instance=this;
+        instance = this;
     }
+
+    void OnDestroy()
+    {
+        if (instance == this)
+            instance = null;
+    }
+
     public override void OnEnable()
     {
         base.OnEnable();
-        SceneManager.sceneLoaded+=OnSceneLoaded; 
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
+
     public override void OnDisable()
     {
         base.OnDisable();
-        SceneManager.sceneLoaded-=OnSceneLoaded;
+        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
-    void OnSceneLoaded(Scene scene,LoadSceneMode loadSceneMode)
+    void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
     {
-        if (scene.buildIndex == 3)
+        if (scene.buildIndex == gameSceneIndex && PhotonNetwork.InRoom)
         {
-            PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs","PlayerControllerManager"),Vector3.zero,Quaternion.identity);
-        }   
+            PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PlayerControllerManager"), Vector3.zero, Quaternion.identity);
+        }
     }
-
 }

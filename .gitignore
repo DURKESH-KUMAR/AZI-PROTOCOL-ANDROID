@@ -1,0 +1,139 @@
+# ==========================================
+# Unity Project .gitignore
+# ==========================================
+
+# ---------- Unity Generated ----------
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+
+# ---------- Unity Cache ----------
+.vs/
+.idea/
+.gradle/
+.nuget/
+sysinfo.txt
+
+# ---------- Asset Import / Crash Reports ----------
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+*.opendb
+*.VC.db
+
+# ---------- Unity Build Outputs ----------
+/Build/
+/Builds/
+/BuildOutput/
+/BuildOutputAndroid/
+/BuildOutputIOS/
+/BuildOutputWindows/
+/BuildOutputWebGL/
+
+# ---------- Addressables ----------
+/ServerData/
+# Keep Addressables settings and assets
+# Ignore generated Addressables build data
+Library/com.unity.addressables/
+
+# ---------- Visual Studio ----------
+.vs/
+*.csproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# ---------- Rider ----------
+.idea/
+*.sln.iml
+
+# ---------- VS Code ----------
+.vscode/
+*.code-workspace
+
+# ---------- JetBrains ----------
+*.DotSettings.user
+
+# ---------- OS Files ----------
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ---------- Windows ----------
+*.stackdump
+
+# ---------- macOS ----------
+.AppleDouble
+.LSOverride
+._*
+
+# ---------- Linux ----------
+*~
+.nfs*
+
+# ---------- Temporary Files ----------
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+
+# ---------- Crash Reports ----------
+sysinfo.txt
+crashlytics-build.properties
+
+# ---------- Unity Package Manager ----------
+/Packages/packages-lock.json
+
+# ---------- Generated Documentation ----------
+/Docs/_build/
+
+# ---------- Build Artifacts ----------
+*.apk
+*.aab
+*.ipa
+*.app
+*.exe
+*.dll
+*.so
+*.dylib
+*.bundle
+
+# ---------- Coverage ----------
+/coverage/
+/TestResults/
+
+# ---------- Firebase ----------
+google-services.json
+GoogleService-Info.plist
+
+# ---------- Secrets / Environment ----------
+.env
+.env.*
+!.env.example
+
+# ---------- Local Configuration ----------
+*.local
+*.local.json
+
+# ---------- Logs ----------
+*.log
+
+# ---------- Temporary Unity Files ----------
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta

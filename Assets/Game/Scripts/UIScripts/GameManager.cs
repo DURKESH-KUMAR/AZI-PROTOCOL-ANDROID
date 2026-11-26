@@ -1,36 +1,39 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Photon.Pun;
 
-public class GameManager : MonoBehaviour
+/// <summary>
+/// Back button (Escape on Android) leaves the match: first leave the Photon room,
+/// THEN load the End scene. Loading a scene while still in the room left ghost
+/// players behind for others and broke the main menu afterwards.
+/// </summary>
+public class GameManager : MonoBehaviourPunCallbacks
 {
-    public bool IsMenuOpened = false;
+    [SerializeField] int endSceneIndex = 4;
+    bool isLeaving;
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            if (!IsMenuOpened)
-            {
-                OpenScene4();
-            }
-            else
-            {
-                CloseMenu();
-            }
-        }
+            OpenScene4();
     }
 
-    void CloseMenu()
-    {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-        IsMenuOpened = false;
-        Time.timeScale = 1f;
-        AudioListener.pause = false;
-    }
-
+    // Kept the original name so existing UI button bindings still work.
     public void OpenScene4()
     {
-        SceneManager.LoadScene(4);   // Scene index 2 = Scene 3
+        if (isLeaving)
+            return;
+        isLeaving = true;
+
+        if (PhotonNetwork.InRoom)
+            PhotonNetwork.LeaveRoom();
+        else
+            SceneManager.LoadScene(endSceneIndex);
+    }
+
+    public override void OnLeftRoom()
+    {
+        if (isLeaving)
+            SceneManager.LoadScene(endSceneIndex);
     }
 }

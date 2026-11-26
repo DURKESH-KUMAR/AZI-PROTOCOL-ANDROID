@@ -15,7 +15,7 @@ public class PlayerUsernameManager : MonoBehaviour
     }
     public void playerUsernameInputValueChanged()
     {
-        string username=usernameInput.text;
+        string username=usernameInput.text.Trim();
         if (!string.IsNullOrEmpty(username) && username.Length <= 20)
         {
             PhotonNetwork.NickName=username;

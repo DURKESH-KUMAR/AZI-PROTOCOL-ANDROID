@@ -1,20 +1,69 @@
 using UnityEngine;
 using UnityEngine.Video;
 using UnityEngine.SceneManagement;
+using Photon.Pun;
 
 public class VideoSceneLoader : MonoBehaviour
 {
+    [Header("Video Settings")]
     public VideoPlayer videoPlayer;
-    public int nextSceneIndex = 1;   // Scene 2 index
 
-    void Start()
+    [Header("Scene Settings")]
+    public int nextSceneIndex = 1;
+
+    bool loading;
+
+    private void Start()
     {
-        videoPlayer.loopPointReached += OnVideoFinished;
-        videoPlayer.Play();
+        if (videoPlayer == null)
+            videoPlayer = GetComponent<VideoPlayer>();
+
+        if (videoPlayer != null)
+        {
+            videoPlayer.isLooping = false;
+            videoPlayer.loopPointReached += OnVideoFinished;
+            videoPlayer.Play();
+        }
+        else
+        {
+            Debug.LogError("VideoPlayer not assigned!");
+        }
     }
 
-    void OnVideoFinished(VideoPlayer vp)
+    bool videoFinished;
+
+    private void Update()
     {
-        SceneManager.LoadScene(nextSceneIndex);
+        // If the master left during the video, the new master moves everyone on.
+        if (videoFinished && !loading && PhotonNetwork.InRoom && PhotonNetwork.IsMasterClient)
+            OnVideoFinished(videoPlayer);
+    }
+
+    private void OnVideoFinished(VideoPlayer vp)
+    {
+        videoFinished = true;
+        if (loading)
+            return;
+
+        if (PhotonNetwork.InRoom)
+        {
+            // Multiplayer (OnBoarding -> match): only the master switches scene, through Photon,
+            // so all clients enter the match together and no spawn messages are lost.
+            if (!PhotonNetwork.IsMasterClient)
+                return;
+            loading = true;
+            PhotonNetwork.LoadLevel(nextSceneIndex);
+        }
+        else
+        {
+            loading = true;
+            SceneManager.LoadScene(nextSceneIndex);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (videoPlayer != null)
+            videoPlayer.loopPointReached -= OnVideoFinished;
     }
 }

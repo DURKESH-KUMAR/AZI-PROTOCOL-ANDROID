@@ -4,14 +4,18 @@ using UnityEngine.UI;
 
 public class LoadingTextAnimator : MonoBehaviour
 {
-    public Text loadingText;     // Assign in Inspector
+    public Text loadingText;      // Assign in Inspector
     public float dotSpeed = 0.5f; // Speed of dot animation
 
-    private string baseText = "Loading";
-    private int dotCount = 0;
+    // Pre-built frames + one cached wait: the old loop allocated a new string and a new
+    // WaitForSeconds every tick (GC churn for as long as the loading screen was up).
+    static readonly string[] Frames = { "Loading", "Loading.", "Loading..", "Loading..." };
+    int dotCount = 0;
+    WaitForSeconds wait;
 
-    void Start()
+    void OnEnable()
     {
+        wait = new WaitForSeconds(dotSpeed);
         StartCoroutine(AnimateLoading());
     }
 
@@ -19,14 +23,10 @@ public class LoadingTextAnimator : MonoBehaviour
     {
         while (true)
         {
-            dotCount++;
-
-            if (dotCount > 3)
-                dotCount = 0;
-
-            loadingText.text = baseText + new string('.', dotCount);
-
-            yield return new WaitForSeconds(dotSpeed);
+            dotCount = (dotCount + 1) % Frames.Length;
+            if (loadingText != null)
+                loadingText.text = Frames[dotCount];
+            yield return wait;
         }
     }
 }
