@@ -45,6 +45,22 @@
             <ui:VisualElement class="radar__self" picking-mode="Ignore" />
         </ui:VisualElement>
 
+        <!-- personal score: kills / deaths / K-D (stays visible while dead) -->
+        <ui:VisualElement name="stats" class="stats" picking-mode="Ignore">
+            <ui:VisualElement class="stat" picking-mode="Ignore">
+                <ui:Label name="stat-kills" text="0" class="stat__value stat__value--kills" picking-mode="Ignore" />
+                <ui:Label text="KILLS" class="stat__label" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:VisualElement class="stat stat--divided" picking-mode="Ignore">
+                <ui:Label name="stat-deaths" text="0" class="stat__value" picking-mode="Ignore" />
+                <ui:Label text="DEATHS" class="stat__label" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:VisualElement class="stat stat--divided" picking-mode="Ignore">
+                <ui:Label name="stat-kd" text="0.0" class="stat__value" picking-mode="Ignore" />
+                <ui:Label text="K/D" class="stat__label" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
         <ui:Button name="pause-button" text="II" class="btn pause-button" />
 
         <!-- states -->

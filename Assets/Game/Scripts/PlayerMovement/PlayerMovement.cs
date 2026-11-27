@@ -366,6 +366,11 @@ public class PlayerMovement : MonoBehaviour
 
         view.RPC(nameof(RPC_OnDied), RpcTarget.All);
 
+        // Fallback: if the spawn data didn't resolve our manager, use the local one, so a death
+        // can never leave the player without a respawn.
+        if (playerControllerManager == null)
+            playerControllerManager = PlayerControllerManager.Local;
+
         string killerName = killer > 0 ? MatchEvents.NameOf(killer) : "";
         float respawn = playerControllerManager != null ? playerControllerManager.RespawnDelay : 3f;
         MatchEvents.RaiseLocalDied(killerName, respawn);
@@ -373,6 +378,8 @@ public class PlayerMovement : MonoBehaviour
 
         if (playerControllerManager != null)
             playerControllerManager.Die(gameObject, corpseTime);
+        else
+            Debug.LogError("[PlayerMovement] No PlayerControllerManager for the local player - cannot respawn.");
     }
 
     /// <summary>Death on every client: no more hits/collisions, body topples over (owner drives it, transform is synced).</summary>

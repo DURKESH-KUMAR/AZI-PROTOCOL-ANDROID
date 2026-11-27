@@ -1,6 +1,6 @@
-using System.Collections;
 using UnityEngine;
 
+/// <summary>Shows <see cref="textObject"/> when the scene starts and hides it after <see cref="displayTime"/> seconds.</summary>
 public class ShowTextForFiveSeconds : MonoBehaviour
 {
     public GameObject textObject;  // Drag your Text GameObject here
@@ -8,18 +8,18 @@ public class ShowTextForFiveSeconds : MonoBehaviour
 
     void Start()
     {
-        StartCoroutine(ShowText());
+        if (textObject == null)
+        {
+            Debug.LogWarning("[ShowTextForFiveSeconds] No text object assigned on " + name);
+            return;
+        }
+        textObject.SetActive(true);
+        Invoke(nameof(Hide), displayTime); // no coroutine/WaitForSeconds allocation
     }
 
-    IEnumerator ShowText()
+    void Hide()
     {
-        // Activate the text
-        textObject.SetActive(true);
-
-        // Wait for 5 seconds
-        yield return new WaitForSeconds(displayTime);
-
-        // Deactivate the text
-        textObject.SetActive(false);
+        if (textObject != null)
+            textObject.SetActive(false);
     }
 }

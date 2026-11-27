@@ -1,1 +1,1 @@
-C:\Users\Public\Documents\Unity Project\AZI-PROTOCOL-ANDROID\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\build\intermediates\cxx\Debug\5d4x2l20\obj\arm64-v8a
+C:\Users\Public\Documents\Unity Project\AZI-PROTOCOL-ANDROID\Library\PramData\AndroidApplicationController\Cache\com.PHANTOMKNIGHT.AZIPROTOCOL\gradle-project\unityLibrary\build\intermediates\cxx\Debug\5d4x2l20\obj\arm64-v8a

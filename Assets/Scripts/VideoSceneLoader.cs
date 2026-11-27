@@ -3,6 +3,13 @@ using UnityEngine.Video;
 using UnityEngine.SceneManagement;
 using Photon.Pun;
 
+/// <summary>
+/// Plays a video, then loads the next scene. Never gets stuck: the scene also moves on if
+/// the video fails to load/play on the device, or if it simply takes too long, and a tap
+/// skips it (after a short moment, so a stray touch doesn't).
+/// In a Photon room only the master switches scene (PhotonNetwork.LoadLevel), so every client
+/// moves together and no spawn messages are lost.
+/// </summary>
 public class VideoSceneLoader : MonoBehaviour
 {
     [Header("Video Settings")]
@@ -11,35 +18,73 @@ public class VideoSceneLoader : MonoBehaviour
     [Header("Scene Settings")]
     public int nextSceneIndex = 1;
 
-    bool loading;
+    [Header("Safety")]
+    [Tooltip("Tap / click to skip the video (offline only - in a room the master decides).")]
+    public bool allowSkip = true;
+    [Tooltip("Seconds before a tap can skip.")]
+    public float skipAfter = 1f;
+    [Tooltip("Move on after this many seconds even if the video never reports its end (0 = video length + 2s).")]
+    public float maxWait = 0f;
 
-    private void Start()
+    bool loading;
+    bool videoFinished;
+    float startTime;
+    float deadline;
+
+    void Start()
     {
+        startTime = Time.unscaledTime;
+        deadline = startTime + (maxWait > 0f ? maxWait : 30f); // until the real length is known
+
         if (videoPlayer == null)
             videoPlayer = GetComponent<VideoPlayer>();
 
-        if (videoPlayer != null)
+        if (videoPlayer == null)
         {
-            videoPlayer.isLooping = false;
-            videoPlayer.loopPointReached += OnVideoFinished;
-            videoPlayer.Play();
+            Debug.LogWarning("[VideoSceneLoader] No VideoPlayer - skipping straight to the next scene.");
+            Finish();
+            return;
         }
-        else
-        {
-            Debug.LogError("VideoPlayer not assigned!");
-        }
+
+        videoPlayer.isLooping = false;
+        videoPlayer.skipOnDrop = true; // slow phones drop frames instead of slowing the video down
+        videoPlayer.loopPointReached += OnVideoFinished;
+        videoPlayer.errorReceived += OnVideoError;
+        videoPlayer.prepareCompleted += OnPrepared;
+        videoPlayer.Play();
     }
 
-    bool videoFinished;
-
-    private void Update()
+    void OnPrepared(VideoPlayer vp)
     {
-        // If the master left during the video, the new master moves everyone on.
-        if (videoFinished && !loading && PhotonNetwork.InRoom && PhotonNetwork.IsMasterClient)
-            OnVideoFinished(videoPlayer);
+        if (maxWait <= 0f && vp.length > 0)
+            deadline = startTime + (float)vp.length + 2f;
     }
 
-    private void OnVideoFinished(VideoPlayer vp)
+    void OnVideoError(VideoPlayer vp, string message)
+    {
+        Debug.LogWarning("[VideoSceneLoader] Video error (" + message + ") - continuing without it.");
+        Finish();
+    }
+
+    void OnVideoFinished(VideoPlayer vp) => Finish();
+
+    void Update()
+    {
+        if (!videoFinished)
+        {
+            if (Time.unscaledTime >= deadline)
+                Finish();
+            else if (allowSkip && !PhotonNetwork.InRoom && Time.unscaledTime - startTime >= skipAfter && Input.GetMouseButtonDown(0))
+                Finish(); // also fires for the first touch on phones
+            return;
+        }
+
+        // If the master left during the video, the new master moves everyone on.
+        if (!loading && PhotonNetwork.InRoom && PhotonNetwork.IsMasterClient)
+            Finish();
+    }
+
+    void Finish()
     {
         videoFinished = true;
         if (loading)
@@ -47,23 +92,26 @@ public class VideoSceneLoader : MonoBehaviour
 
         if (PhotonNetwork.InRoom)
         {
-            // Multiplayer (OnBoarding -> match): only the master switches scene, through Photon,
-            // so all clients enter the match together and no spawn messages are lost.
             if (!PhotonNetwork.IsMasterClient)
-                return;
+                return; // the master's LoadLevel brings this client along
             loading = true;
             PhotonNetwork.LoadLevel(nextSceneIndex);
         }
         else
         {
             loading = true;
+            if (videoPlayer != null)
+                videoPlayer.Stop();
             SceneManager.LoadScene(nextSceneIndex);
         }
     }
 
-    private void OnDestroy()
+    void OnDestroy()
     {
-        if (videoPlayer != null)
-            videoPlayer.loopPointReached -= OnVideoFinished;
+        if (videoPlayer == null)
+            return;
+        videoPlayer.loopPointReached -= OnVideoFinished;
+        videoPlayer.errorReceived -= OnVideoError;
+        videoPlayer.prepareCompleted -= OnPrepared;
     }
 }

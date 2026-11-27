@@ -350,3 +350,53 @@
     color: var(--muted);
     margin-bottom: 40px;
 }
+
+/* ------------------------------------------------------------ personal score */
+
+.stats {
+    position: absolute;
+    top: 362px;
+    left: 24px;
+    width: 230px;
+    flex-direction: row;
+    padding: 8px 0;
+    background-color: rgba(5, 13, 20, 0.6);
+    border-radius: 4px;
+    border-left-width: 4px;
+    border-left-color: var(--accent);
+}
+
+.stat {
+    flex-grow: 1;
+    flex-basis: 0;
+    align-items: center;
+}
+
+.stat--divided {
+    border-left-width: 1px;
+    border-left-color: rgba(255, 255, 255, 0.12);
+}
+
+.stat__value {
+    font-size: 32px;
+    -unity-text-align: middle-center;
+    transition-property: scale, color;
+    transition-duration: 0.35s, 0.35s;
+    transition-timing-function: ease-out-back, ease-out;
+}
+
+.stat__value--kills {
+    color: var(--accent);
+}
+
+.stat__value--pop {
+    scale: 1.5 1.5;
+    color: #FFFFFF;
+    transition-duration: 0s, 0s;
+}
+
+.stat__label {
+    font-size: 15px;
+    letter-spacing: 2px;
+    color: var(--muted);
+}

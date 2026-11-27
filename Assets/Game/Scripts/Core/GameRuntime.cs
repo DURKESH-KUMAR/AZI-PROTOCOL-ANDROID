@@ -72,6 +72,10 @@ public class GameRuntime : MonoBehaviour
         if (mode != LoadSceneMode.Single)
             return;
 
+        // Music fades down during the match (gunfire and footsteps stay clear), up elsewhere.
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.SetDucked(scene.name == GameScenes.Match);
+
         switch (scene.name)
         {
             case GameScenes.Match:

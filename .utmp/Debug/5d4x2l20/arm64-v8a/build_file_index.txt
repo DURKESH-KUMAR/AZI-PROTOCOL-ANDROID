@@ -1,2 +1,2 @@
-C:\Users\Public\Documents\Unity Project\AZI-PROTOCOL-ANDROID\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\CMakeLists.txt
-C:\Users\Public\Documents\Unity Project\AZI-PROTOCOL-ANDROID\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\CMakeLists.txt
+C:\Users\Public\Documents\Unity Project\AZI-PROTOCOL-ANDROID\Library\PramData\AndroidApplicationController\Cache\com.PHANTOMKNIGHT.AZIPROTOCOL\gradle-project\unityLibrary\src\main\cpp\CMakeLists.txt
+C:\Users\Public\Documents\Unity Project\AZI-PROTOCOL-ANDROID\Library\PramData\AndroidApplicationController\Cache\com.PHANTOMKNIGHT.AZIPROTOCOL\gradle-project\unityLibrary\src\main\cpp\GameActivity\CMakeLists.txt

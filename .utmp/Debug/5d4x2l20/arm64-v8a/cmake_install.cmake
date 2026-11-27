@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/Public/Documents/Unity Project/AZI-PROTOCOL-ANDROID/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp
+# Install script for directory: C:/Users/Public/Documents/Unity Project/AZI-PROTOCOL-ANDROID/Library/PramData/AndroidApplicationController/Cache/com.PHANTOMKNIGHT.AZIPROTOCOL/gradle-project/unityLibrary/src/main/cpp
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

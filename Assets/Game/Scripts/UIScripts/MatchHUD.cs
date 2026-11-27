@@ -54,6 +54,13 @@ public class MatchHUD : MonoBehaviour
         public bool fading;
     }
 
+    // Personal score (counted from kill events instantly, reconciled with the master's
+    // player properties so it is also right after a rejoin).
+    Label statKills, statDeaths, statKd;
+    int myKills, myDeaths, shownKills = -1, shownDeaths = -1;
+    float statsTimer;
+    bool spawnedBefore;
+
     void Awake()
     {
         Instance = this;
@@ -100,6 +107,9 @@ public class MatchHUD : MonoBehaviour
         killfeed = root.Q("killfeed");
         radar = root.Q("radar");
         radarDots = root.Q("radar-dots");
+        statKills = root.Q<Label>("stat-kills");
+        statDeaths = root.Q<Label>("stat-deaths");
+        statKd = root.Q<Label>("stat-kd");
         death = root.Q("death");
         deathTitle = root.Q<Label>("death-title");
         deathTimer = root.Q<Label>("death-timer");
@@ -203,6 +213,9 @@ public class MatchHUD : MonoBehaviour
         localCamera = player != null ? player.GetComponentInChildren<Camera>(true) : null;
         death.SetVisible(false);
         shownAmmo = shownMaxAmmo = -1;
+        if (player != null && spawnedBefore && !MatchState.IsOver)
+            ShowCallout("BACK IN ACTION", "Spawn protection active", 1.6f);
+        spawnedBefore |= player != null;
     }
 
     void OnLocalHit()
@@ -235,8 +248,14 @@ public class MatchHUD : MonoBehaviour
     void OnKill(KillInfo info)
     {
         AddFeedEntry(info);
+        if (info.LocalIsVictim)
+            myDeaths++;
         if (!info.LocalIsKiller)
             return;
+
+        myKills++;
+        statKills.AddToClassList("stat__value--pop"); // pop, then ease back (USS transition)
+        statKills.schedule.Execute(() => statKills.RemoveFromClassList("stat__value--pop")).StartingIn(60);
 
         killStreak++;
         hitUntil = Time.time + 0.3f;
@@ -329,6 +348,7 @@ public class MatchHUD : MonoBehaviour
         UpdateFeed();
         UpdateRadar();
         UpdateDeath();
+        UpdateStats(dt);
     }
 
     void UpdateWeapon()
@@ -551,12 +571,37 @@ public class MatchHUD : MonoBehaviour
         return d;
     }
 
+    void UpdateStats(float dt)
+    {
+        statsTimer -= dt;
+        if (statsTimer <= 0f)
+        {
+            statsTimer = 0.5f;
+            Photon.Realtime.Player me = PhotonNetwork.LocalPlayer;
+            if (me != null && PhotonNetwork.InRoom)
+            {
+                myKills = Mathf.Max(myKills, GameProps.GetInt(me.CustomProperties, GameProps.Kills));
+                myDeaths = Mathf.Max(myDeaths, GameProps.GetInt(me.CustomProperties, GameProps.Deaths));
+            }
+        }
+
+        if (myKills == shownKills && myDeaths == shownDeaths)
+            return;
+        shownKills = myKills;
+        shownDeaths = myDeaths;
+        statKills.text = myKills.ToString();
+        statDeaths.text = myDeaths.ToString();
+        statKd.text = (myDeaths == 0 ? myKills : myKills / (float)myDeaths).ToString("0.0");
+    }
+
     void UpdateDeath()
     {
         if (death.ClassListContains("hidden"))
             return;
         float left = Mathf.Max(0f, respawnAt - Time.time);
-        string text = MatchState.IsOver ? "" : left > 0.05f ? "Respawning in " + Mathf.CeilToInt(left) : "Respawning...";
+        PlayerControllerManager manager = PlayerControllerManager.Local;
+        string where = manager != null ? " at " + manager.BaseName : "";
+        string text = MatchState.IsOver ? "" : left > 0.05f ? "Respawning" + where + " in " + Mathf.CeilToInt(left) : "Respawning" + where + "...";
         if (text != shownDeathTimer)
         {
             shownDeathTimer = text;
