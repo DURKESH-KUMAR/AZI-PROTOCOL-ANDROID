@@ -50,14 +50,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Viking Village\Boat Attack Water System\Scripts\MainCameraAlign.cs" />
-    <Compile Include="Assets\Viking Village\Boat Attack Water System\Scripts\Data\WaterSettingsData.cs" />
-    <Compile Include="Assets\Viking Village\Boat Attack Water System\Scripts\Rendering\WaterSystemFeature.cs" />
-    <Compile Include="Assets\Viking Village\Boat Attack Water System\Scripts\Data\WaterResources.cs" />
-    <Compile Include="Assets\Viking Village\Boat Attack Water System\Scripts\Rendering\PlanarReflections.cs" />
     <Compile Include="Assets\Viking Village\Boat Attack Water System\Scripts\Data\WaterSurfaceData.cs" />
+    <Compile Include="Assets\Viking Village\Boat Attack Water System\Scripts\Data\WaterSettingsData.cs" />
     <Compile Include="Assets\Viking Village\Boat Attack Water System\Scripts\LocalToWorldJob.cs" />
     <Compile Include="Assets\Viking Village\Boat Attack Water System\Scripts\Water.cs" />
     <Compile Include="Assets\Viking Village\Boat Attack Water System\Scripts\GerstnerWavesJobs.cs" />
+    <Compile Include="Assets\Viking Village\Boat Attack Water System\Scripts\Rendering\WaterSystemFeature.cs" />
+    <Compile Include="Assets\Viking Village\Boat Attack Water System\Scripts\Data\WaterResources.cs" />
+    <Compile Include="Assets\Viking Village\Boat Attack Water System\Scripts\Rendering\PlanarReflections.cs" />
     <Compile Include="Assets\Viking Village\Boat Attack Water System\Scripts\BuoyantObject.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -688,16 +688,12 @@
       <HintPath>Assets\Photon\PhotonLibs\netstandard2.0\Photon3Unity3D.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe">
-      <HintPath>Library\PackageCache\com.unity.collections@9796e5ee0d9e\Unity.Collections.Tests\System.Runtime.CompilerServices.Unsafe\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>Library\PackageCache\com.unity.nuget.newtonsoft-json@4dfd81071c64\Runtime\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="AiEditorToolsSdk">
-      <HintPath>Library\PackageCache\com.unity.ai.toolkit@48a271771d1a\Modules\Sdk\Editor\AiEditorToolsSdk.dll</HintPath>
+      <HintPath>Library\PackageCache\com.unity.ai.toolkit@97783faabe3b\Modules\Sdk\Editor\AiEditorToolsSdk.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.VisualScripting.TextureAssets">
@@ -706,6 +702,10 @@
     </Reference>
     <Reference Include="Mono.Cecil">
       <HintPath>Library\PackageCache\com.unity.nuget.mono-cecil@ecb9724e46ff\Mono.Cecil.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe">
+      <HintPath>Library\PackageCache\com.unity.collections@9796e5ee0d9e\Unity.Collections.Tests\System.Runtime.CompilerServices.Unsafe\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Analytics.StandardEvents">

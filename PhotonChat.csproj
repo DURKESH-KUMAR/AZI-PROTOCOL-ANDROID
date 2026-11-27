@@ -49,18 +49,18 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.3.18f1\Editor\Data\Tools\BuildPipeline\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Photon\PhotonChat\Code\ChatState.cs" />
-    <Compile Include="Assets\Photon\PhotonChat\Code\ChatPeer.cs" />
-    <Compile Include="Assets\Photon\PhotonChat\Code\ChatParameterCode.cs" />
-    <Compile Include="Assets\Photon\PhotonChat\Code\IChatClientListener.cs" />
     <Compile Include="Assets\Photon\PhotonChat\Code\ChannelWellKnownProperties.cs" />
+    <Compile Include="Assets\Photon\PhotonChat\Code\ChatState.cs" />
     <Compile Include="Assets\Photon\PhotonChat\Code\ChatClient.cs" />
     <Compile Include="Assets\Photon\PhotonChat\Code\ChatUserStatus.cs" />
+    <Compile Include="Assets\Photon\PhotonChat\Code\ChatPeer.cs" />
     <Compile Include="Assets\Photon\PhotonChat\Code\ChannelCreationOptions.cs" />
     <Compile Include="Assets\Photon\PhotonChat\Code\ChatOperationCode.cs" />
     <Compile Include="Assets\Photon\PhotonChat\Code\ChatEventCode.cs" />
     <Compile Include="Assets\Photon\PhotonChat\Code\ChatDisconnectCause.cs" />
+    <Compile Include="Assets\Photon\PhotonChat\Code\ChatParameterCode.cs" />
     <Compile Include="Assets\Photon\PhotonChat\Code\ChatChannel.cs" />
+    <Compile Include="Assets\Photon\PhotonChat\Code\IChatClientListener.cs" />
     <Compile Include="Assets\Photon\PhotonChat\Code\ChatAppSettings.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -692,16 +692,12 @@
       <HintPath>Assets\Photon\PhotonLibs\netstandard2.0\Photon3Unity3D.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe">
-      <HintPath>Library\PackageCache\com.unity.collections@9796e5ee0d9e\Unity.Collections.Tests\System.Runtime.CompilerServices.Unsafe\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>Library\PackageCache\com.unity.nuget.newtonsoft-json@4dfd81071c64\Runtime\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="AiEditorToolsSdk">
-      <HintPath>Library\PackageCache\com.unity.ai.toolkit@48a271771d1a\Modules\Sdk\Editor\AiEditorToolsSdk.dll</HintPath>
+      <HintPath>Library\PackageCache\com.unity.ai.toolkit@97783faabe3b\Modules\Sdk\Editor\AiEditorToolsSdk.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.VisualScripting.TextureAssets">
@@ -710,6 +706,10 @@
     </Reference>
     <Reference Include="Mono.Cecil">
       <HintPath>Library\PackageCache\com.unity.nuget.mono-cecil@ecb9724e46ff\Mono.Cecil.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe">
+      <HintPath>Library\PackageCache\com.unity.collections@9796e5ee0d9e\Unity.Collections.Tests\System.Runtime.CompilerServices.Unsafe\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Analytics.StandardEvents">

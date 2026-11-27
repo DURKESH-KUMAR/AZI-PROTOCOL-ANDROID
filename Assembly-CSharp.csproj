@@ -53,26 +53,42 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Viking Village\Scripts\DeviceTypeUI.cs" />
+    <Compile Include="Assets\Game\Scripts\Core\PhotonAuth.cs" />
     <Compile Include="Assets\JMO Assets\WarFX\Demo\Assets\WFX_Demo_RandomDir.cs" />
+    <Compile Include="Assets\Photon\PhotonChat\Demos\DemoChat\AppSettingsExtensions.cs" />
     <Compile Include="Assets\Game\Scripts\PlayerControls\PlayerControls.cs" />
+    <Compile Include="Assets\Game\Scripts\Multiplayer\PlayerControllerManager.cs" />
     <Compile Include="Assets\Scripts\VideoSceneLoader.cs" />
     <Compile Include="Assets\JMO Assets\WarFX\Demo\Assets\CFX_Demo_RotateCamera.cs" />
+    <Compile Include="Assets\Viking Village\Scripts\ForceToAcessibleVolume.cs" />
     <Compile Include="Assets\Game\Scripts\Core\MatchResults.cs" />
+    <Compile Include="Assets\SlimUI\Modern Menu 1\Scripts\Audio\CheckSFXVolume.cs" />
     <Compile Include="Assets\SlimUI\Modern Menu 1\Scripts\ThemeEditor\ThemedUI.cs" />
+    <Compile Include="Assets\Photon\PhotonChat\Demos\DemoChat\ChannelSelector.cs" />
+    <Compile Include="Assets\Viking Village\Scripts\FlyingRigidbodyFirstPersonController.cs" />
+    <Compile Include="Assets\Viking Village\Standard Assets\Utility\FPSCounter.cs" />
+    <Compile Include="Assets\Viking Village\Standard Assets\Characters\FirstPersonCharacter\Scripts\MouseLook.cs" />
     <Compile Include="Assets\Game\Scripts\UIScripts\UsernameBillboard.cs" />
     <Compile Include="Assets\Photon\PhotonChat\Demos\DemoChat\FriendItem.cs" />
+    <Compile Include="Assets\Joystick Pack\Scripts\Joysticks\FloatingJoystick.cs" />
     <Compile Include="Assets\Scripts\AudioManager.cs" />
     <Compile Include="Assets\Viking Village\Standard Assets\Characters\FirstPersonCharacter\Scripts\FirstPersonController.cs" />
     <Compile Include="Assets\Game\Scripts\Multiplayer\PlayerTeams.cs" />
+    <Compile Include="Assets\Game\Scripts\UIScripts\OnBoardingUI.cs" />
     <Compile Include="Assets\Game\Scripts\ResetisJumping.cs" />
     <Compile Include="Assets\Viking Village\Scripts\ControlSwitch.cs" />
     <Compile Include="Assets\Game\Scripts\Core\GameRuntime.cs" />
     <Compile Include="Assets\Game\Scripts\PlayerControls\InputManager.cs" />
     <Compile Include="Assets\Photon\PhotonRealtime\Demos\DemoLoadBalancing\ConnectAndJoinRandomLb.cs" />
     <Compile Include="Assets\Viking Village\Scripts\FreeCamera.cs" />
+    <Compile Include="Assets\Game\Scripts\PlayerMovement\PlayerManager.cs" />
     <Compile Include="Assets\JMO Assets\WarFX\Scripts\CFX_LightIntensityFade.cs" />
+    <Compile Include="Assets\SlimUI\Modern Menu 1\Scripts\ThemeEditor\ThemedUIElement.cs" />
+    <Compile Include="Assets\Game\Scripts\UIScripts\UsernameTeamDisplay.cs" />
     <Compile Include="Assets\Game\Scripts\Multiplayer\Menu.cs" />
     <Compile Include="Assets\Game\Scripts\ShootingController\ShootingController.cs" />
+    <Compile Include="Assets\Viking Village\Standard Assets\Utility\FOVKick.cs" />
+    <Compile Include="Assets\Photon\PhotonChat\Demos\DemoChat\ChatGui.cs" />
     <Compile Include="Assets\Game\Scripts\Core\TouchControls.cs" />
     <Compile Include="Assets\Viking Village\Standard Assets\Utility\CurveControlledBob.cs" />
     <Compile Include="Assets\Photon\PhotonChat\Demos\DemoChat\ChatAppIdCheckerUI.cs" />
@@ -81,19 +97,31 @@
     <Compile Include="Assets\Scripts\TextDisplayTimer.cs" />
     <Compile Include="Assets\SlimUI\Modern Menu 1\Scripts\ThemeEditor\ThemedUIData.cs" />
     <Compile Include="Assets\JMO Assets\WarFX\Demo\Assets\WFX_Demo_Wall.cs" />
+    <Compile Include="Assets\SlimUI\Modern Menu 1\Scripts\Audio\CheckMusicVolume.cs" />
     <Compile Include="Assets\Viking Village\Standard Assets\Characters\FirstPersonCharacter\Scripts\HeadBob.cs" />
     <Compile Include="Assets\Photon\PhotonChat\Demos\DemoChat\NamePickGui.cs" />
+    <Compile Include="Assets\Game\Scripts\Core\GameUI.cs" />
     <Compile Include="Assets\Joystick Pack\Scripts\Joysticks\FixedJoystick.cs" />
+    <Compile Include="Assets\JMO Assets\WarFX\Scripts\CFX_AutoDestructShuriken.cs" />
     <Compile Include="Assets\Game\Scripts\ResetBool.cs" />
+    <Compile Include="Assets\Game\Scripts\Multiplayer\PlayerListItem.cs" />
     <Compile Include="Assets\JMO Assets\WarFX\Demo\Assets\CFX_AutoStopLoopedEffect.cs" />
     <Compile Include="Assets\Scripts\LoadingTextAnimator.cs" />
+    <Compile Include="Assets\SlimUI\Modern Menu 1\Scripts\Misc\ExtraLinks.cs" />
     <Compile Include="Assets\Game\Scripts\Core\EffectPool.cs" />
     <Compile Include="Assets\Game\Scripts\Core\GameAudio.cs" />
+    <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\Game\Scripts\UIScripts\ResultsScreen.cs" />
     <Compile Include="Assets\Photon\PhotonChat\Demos\Common\TextToggleIsOnTransition.cs" />
     <Compile Include="Assets\Game\Scripts\Core\GameConstants.cs" />
     <Compile Include="Assets\Game\Scripts\PlayerMovement\FootstepAudio.cs" />
     <Compile Include="Assets\Game\Scripts\Multiplayer\PlayerUsernameManager.cs" />
+    <Compile Include="Assets\JMO Assets\WarFX\Scripts\WFX_BulletHoleDecal.cs" />
+    <Compile Include="Assets\Joystick Pack\Scripts\Joysticks\DynamicJoystick.cs" />
+    <Compile Include="Assets\Joystick Pack\Scripts\Base\Joystick.cs" />
+    <Compile Include="Assets\Viking Village\Standard Assets\Utility\LerpControlledBob.cs" />
+    <Compile Include="Assets\Photon\PhotonChat\Demos\DemoChat\IgnoreUiRaycastWhenInactive.cs" />
+    <Compile Include="Assets\Game\Scripts\PlayerControls\PlayerControlsUI.cs" />
     <Compile Include="Assets\Joystick Pack\Examples\JoystickPlayerExample.cs" />
     <Compile Include="Assets\Game\Scripts\UIScripts\TimerScript.cs" />
     <Compile Include="Assets\Scripts\ShowTextForFiveSeconds.cs" />
@@ -102,64 +130,36 @@
     <Compile Include="Assets\Game\Scripts\PlayerMovement\PlayerMovement.cs" />
     <Compile Include="Assets\SlimUI\Modern Menu 1\Scripts\Managers\UIMenuManager.cs" />
     <Compile Include="Assets\SlimUI\Modern Menu 1\Scripts\Misc\ResetDemo.cs" />
-    <Compile Include="Assets\Photon\PhotonChat\Demos\Common\OnStartDelete.cs" />
-    <Compile Include="Assets\Game\Scripts\Multiplayer\RoomListItem.cs" />
-    <Compile Include="Assets\SlimUI\Modern Menu 1\Scripts\Managers\UISettingsManager.cs" />
-    <Compile Include="Assets\Scripts\DialogueManager.cs" />
-    <Compile Include="Assets\Game\Scripts\PlayerMovement\AnimatorManager.cs" />
-    <Compile Include="Assets\Viking Village\Scripts\MouseLock.cs" />
-    <Compile Include="Assets\Game\Scripts\Core\MatchEvents.cs" />
-    <Compile Include="Assets\Scripts\RandomLoadingScreen.cs" />
-    <Compile Include="Assets\Game\Scripts\Multiplayer\Launcher.cs" />
-    <Compile Include="Assets\Viking Village\Scripts\twinkle.cs" />
-    <Compile Include="Assets\JMO Assets\WarFX\Demo\Assets\WFX_Demo.cs" />
-    <Compile Include="Assets\Game\Scripts\PlayerMovement\CameraManager.cs" />
-    <Compile Include="Assets\Photon\PhotonChat\Demos\Common\TextButtonTransition.cs" />
-    <Compile Include="Assets\Game\Scripts\Core\GameSettings.cs" />
-    <Compile Include="Assets\Game\Scripts\Core\PhotonAuth.cs" />
-    <Compile Include="Assets\Photon\PhotonChat\Demos\DemoChat\AppSettingsExtensions.cs" />
-    <Compile Include="Assets\Game\Scripts\Multiplayer\PlayerControllerManager.cs" />
-    <Compile Include="Assets\Viking Village\Scripts\ForceToAcessibleVolume.cs" />
-    <Compile Include="Assets\SlimUI\Modern Menu 1\Scripts\Audio\CheckSFXVolume.cs" />
-    <Compile Include="Assets\Photon\PhotonChat\Demos\DemoChat\ChannelSelector.cs" />
-    <Compile Include="Assets\Viking Village\Scripts\FlyingRigidbodyFirstPersonController.cs" />
-    <Compile Include="Assets\Viking Village\Standard Assets\Utility\FPSCounter.cs" />
-    <Compile Include="Assets\Viking Village\Standard Assets\Characters\FirstPersonCharacter\Scripts\MouseLook.cs" />
-    <Compile Include="Assets\Joystick Pack\Scripts\Joysticks\FloatingJoystick.cs" />
-    <Compile Include="Assets\Game\Scripts\UIScripts\OnBoardingUI.cs" />
-    <Compile Include="Assets\Game\Scripts\PlayerMovement\PlayerManager.cs" />
-    <Compile Include="Assets\SlimUI\Modern Menu 1\Scripts\ThemeEditor\ThemedUIElement.cs" />
-    <Compile Include="Assets\Game\Scripts\UIScripts\UsernameTeamDisplay.cs" />
-    <Compile Include="Assets\Viking Village\Standard Assets\Utility\FOVKick.cs" />
-    <Compile Include="Assets\Photon\PhotonChat\Demos\DemoChat\ChatGui.cs" />
-    <Compile Include="Assets\SlimUI\Modern Menu 1\Scripts\Audio\CheckMusicVolume.cs" />
-    <Compile Include="Assets\Game\Scripts\Core\GameUI.cs" />
-    <Compile Include="Assets\JMO Assets\WarFX\Scripts\CFX_AutoDestructShuriken.cs" />
-    <Compile Include="Assets\Game\Scripts\Multiplayer\PlayerListItem.cs" />
-    <Compile Include="Assets\SlimUI\Modern Menu 1\Scripts\Misc\ExtraLinks.cs" />
-    <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
-    <Compile Include="Assets\JMO Assets\WarFX\Scripts\WFX_BulletHoleDecal.cs" />
-    <Compile Include="Assets\Joystick Pack\Scripts\Joysticks\DynamicJoystick.cs" />
-    <Compile Include="Assets\Joystick Pack\Scripts\Base\Joystick.cs" />
-    <Compile Include="Assets\Viking Village\Standard Assets\Utility\LerpControlledBob.cs" />
-    <Compile Include="Assets\Photon\PhotonChat\Demos\DemoChat\IgnoreUiRaycastWhenInactive.cs" />
-    <Compile Include="Assets\Game\Scripts\PlayerControls\PlayerControlsUI.cs" />
     <Compile Include="Assets\Viking Village\Standard Assets\Utility\CameraRefocus.cs" />
     <Compile Include="Assets\JMO Assets\WarFX\Demo\Assets\WFX_Demo_DeleteAfterDelay.cs" />
     <Compile Include="Assets\Joystick Pack\Examples\JoystickSetterExample.cs" />
+    <Compile Include="Assets\Photon\PhotonChat\Demos\Common\OnStartDelete.cs" />
     <Compile Include="Assets\JMO Assets\WarFX\Demo\Assets\WFX_Demo_New.cs" />
+    <Compile Include="Assets\Game\Scripts\Multiplayer\RoomListItem.cs" />
     <Compile Include="Assets\Game\Scripts\UIScripts\ScoreBoard.cs" />
     <Compile Include="Assets\Game\Scripts\UIScripts\MainMenuUI.cs" />
+    <Compile Include="Assets\SlimUI\Modern Menu 1\Scripts\Managers\UISettingsManager.cs" />
+    <Compile Include="Assets\Scripts\DialogueManager.cs" />
     <Compile Include="Assets\JMO Assets\WarFX\Demo\Assets\CFX_Demo_Translate.cs" />
     <Compile Include="Assets\Game\Scripts\Multiplayer\MenuManager.cs" />
+    <Compile Include="Assets\Game\Scripts\PlayerMovement\AnimatorManager.cs" />
+    <Compile Include="Assets\Viking Village\Scripts\MouseLock.cs" />
     <Compile Include="Assets\Game\Scripts\UIScripts\SettingsPanel.cs" />
     <Compile Include="Assets\Viking Village\Standard Assets\Characters\FirstPersonCharacter\Scripts\RigidbodyFirstPersonController.cs" />
     <Compile Include="Assets\Scripts\LandscapeManager.cs" />
     <Compile Include="Assets\JMO Assets\WarFX\Demo\Assets\CFX_Demo_RandomDir.cs" />
+    <Compile Include="Assets\Game\Scripts\Core\MatchEvents.cs" />
+    <Compile Include="Assets\Scripts\RandomLoadingScreen.cs" />
+    <Compile Include="Assets\Game\Scripts\Multiplayer\Launcher.cs" />
     <Compile Include="Assets\Photon\PhotonChat\Demos\Common\EventSystemSpawner.cs" />
     <Compile Include="Assets\JMO Assets\WarFX\Spawn System\CFX_SpawnSystem.cs" />
-    <Compile Include="Assets\Game\Scripts\Multiplayer\RoomManager.cs" />
+    <Compile Include="Assets\Viking Village\Scripts\twinkle.cs" />
+    <Compile Include="Assets\JMO Assets\WarFX\Demo\Assets\WFX_Demo.cs" />
+    <Compile Include="Assets\Game\Scripts\PlayerMovement\CameraManager.cs" />
     <Compile Include="Assets\Game\Scripts\UIScripts\GameManager.cs" />
+    <Compile Include="Assets\Game\Scripts\Multiplayer\RoomManager.cs" />
+    <Compile Include="Assets\Photon\PhotonChat\Demos\Common\TextButtonTransition.cs" />
+    <Compile Include="Assets\Game\Scripts\Core\GameSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Game\Resources\UI\Results.uss" />
@@ -811,16 +811,16 @@
       <HintPath>Assets\Photon\PhotonLibs\netstandard2.0\Photon3Unity3D.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe">
-      <HintPath>Library\PackageCache\com.unity.collections@9796e5ee0d9e\Unity.Collections.Tests\System.Runtime.CompilerServices.Unsafe\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>Library\PackageCache\com.unity.nuget.newtonsoft-json@4dfd81071c64\Runtime\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Mono.Cecil">
       <HintPath>Library\PackageCache\com.unity.nuget.mono-cecil@ecb9724e46ff\Mono.Cecil.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe">
+      <HintPath>Library\PackageCache\com.unity.collections@9796e5ee0d9e\Unity.Collections.Tests\System.Runtime.CompilerServices.Unsafe\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Analytics.StandardEvents">
@@ -1447,8 +1447,8 @@
       <HintPath>Library\ScriptAssemblies\Unity.Services.Authentication.Editor.Shared.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.AI.Assistant.Bridge.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.AI.Assistant.Bridge.Editor.dll</HintPath>
+    <Reference Include="Unity.Analytics.DataPrivacy">
+      <HintPath>Library\ScriptAssemblies\Unity.Analytics.DataPrivacy.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary">
@@ -1457,10 +1457,6 @@
     </Reference>
     <Reference Include="Unity.VisualScripting.Flow">
       <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Flow.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Analytics.DataPrivacy">
-      <HintPath>Library\ScriptAssemblies\Unity.Analytics.DataPrivacy.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.TextMeshPro.Editor">
@@ -1521,10 +1517,6 @@
     </Reference>
     <Reference Include="Unity.RenderPipelines.Universal.Runtime">
       <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Runtime.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.AI.Assistant.AvatarHelper.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.AI.Assistant.AvatarHelper.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.Advertisements.Editor">
@@ -1659,10 +1651,6 @@
       <HintPath>Library\ScriptAssemblies\UnityEngine.Purchasing.Stores.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.AI.Assistant.Agent.Dynamic.Extension.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.AI.Assistant.Agent.Dynamic.Extension.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Timeline.Editor.dll</HintPath>
       <Private>False</Private>
@@ -1673,10 +1661,6 @@
     </Reference>
     <Reference Include="Unity.Mathematics">
       <HintPath>Library\ScriptAssemblies\Unity.Mathematics.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Serialization">
-      <HintPath>Library\ScriptAssemblies\Unity.Serialization.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Multiplayer.Center.Common">
@@ -1725,10 +1709,6 @@
     </Reference>
     <Reference Include="Unity.Collections.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Collections.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Serialization.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Serialization.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.ShaderGraph.Editor">

@@ -346,6 +346,23 @@ public class PlayerMovement : MonoBehaviour
         return true;
     }
 
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+    /// <summary>
+    /// Test helper (editor / development builds only, see PlayerManager: F1 = -50 HP, F2 = die):
+    /// takes damage like a hit with no attacker, so death -> respawn can be tested alone.
+    /// </summary>
+    public void DebugTakeDamage(float damage)
+    {
+        if (!view.IsMine || isDead || MatchState.IsOver)
+            return;
+        currentHealth = Mathf.Max(0f, currentHealth - damage);
+        view.RPC(nameof(RPC_SyncHealth), RpcTarget.Others, currentHealth);
+        MatchEvents.RaiseLocalDamaged(damage, transform.position + transform.forward * 5f);
+        if (currentHealth <= 0f)
+            Die(-1);
+    }
+#endif
+
     [PunRPC]
     void RPC_SyncHealth(float health)
     {
@@ -359,27 +376,47 @@ public class PlayerMovement : MonoBehaviour
         // Guard: several damage RPCs can arrive in the same frame before the destroy takes effect.
         isDead = true;
         currentHealth = 0f;
-
         int killer = killerActor == OwnerActor ? -1 : killerActor;
-        if (ScoreBoard.instance != null)
-            ScoreBoard.instance.ReportDeath(playerTeam, OwnerActor, killer);
 
-        view.RPC(nameof(RPC_OnDied), RpcTarget.All);
+        // Order matters: everything the RESPAWN depends on runs first, and each step is isolated,
+        // so a failure in one (e.g. scoring/network) can never leave the player stuck dead.
+        // (Before, an exception in the scoreboard report aborted Die() here: the controls
+        // vanished, but there was no death screen and no respawn.)
 
-        // Fallback: if the spawn data didn't resolve our manager, use the local one, so a death
-        // can never leave the player without a respawn.
+        // 1) Death on every client: topple, colliders off.
+        Try(() => view.RPC(nameof(RPC_OnDied), RpcTarget.All), "death broadcast");
+
+        // 2) Respawn (falls back to the local manager if the spawn data did not resolve it).
         if (playerControllerManager == null)
             playerControllerManager = PlayerControllerManager.Local;
-
-        string killerName = killer > 0 ? MatchEvents.NameOf(killer) : "";
         float respawn = playerControllerManager != null ? playerControllerManager.RespawnDelay : 3f;
-        MatchEvents.RaiseLocalDied(killerName, respawn);
-        GameSettings.Vibrate();
-
         if (playerControllerManager != null)
-            playerControllerManager.Die(gameObject, corpseTime);
+            Try(() => playerControllerManager.Die(gameObject, corpseTime), "respawn");
         else
             Debug.LogError("[PlayerMovement] No PlayerControllerManager for the local player - cannot respawn.");
+
+        // 3) Local feedback: death screen, vibration.
+        string killerName = killer > 0 ? MatchEvents.NameOf(killer) : "";
+        Try(() => MatchEvents.RaiseLocalDied(killerName, respawn), "death screen");
+        GameSettings.Vibrate();
+
+        // 4) Scoring last: kill credit, deaths, team score, kill feed.
+        if (ScoreBoard.instance != null)
+            Try(() => ScoreBoard.instance.ReportDeath(playerTeam, OwnerActor, killer), "score report");
+        else
+            Debug.LogWarning("[PlayerMovement] No ScoreBoard in the scene - this death is not scored.");
+    }
+
+    static void Try(System.Action step, string what)
+    {
+        try
+        {
+            step();
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogException(new System.Exception("[PlayerMovement] Death step failed: " + what, e));
+        }
     }
 
     /// <summary>Death on every client: no more hits/collisions, body topples over (owner drives it, transform is synced).</summary>

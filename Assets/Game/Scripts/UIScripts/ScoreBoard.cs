@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
+using ExitGames.Client.Photon;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 /// <summary>
@@ -13,9 +14,16 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 /// - Only the master changes them, so two deaths at the same moment can't overwrite each other.
 /// - Broadcasts the kill feed, checks the score limit and ends the match (-> Results scene).
 /// Team 1 (BLUE) deaths score for Red, team 2 (RED) deaths score for Blue.
+/// Messages use PhotonNetwork.RaiseEvent, not RPCs: the ScoreBoard object in the match scene has
+/// no PhotonView (the old RPC version threw a NullReferenceException on every death, which
+/// stopped the death sequence and the respawn).
 /// </summary>
-public class ScoreBoard : MonoBehaviourPunCallbacks
+public class ScoreBoard : MonoBehaviourPunCallbacks, IOnEventCallback
 {
+    // Photon event codes (must be below 200; 41/42 are not used anywhere else in the project).
+    const byte EvReportDeath = 41;
+    const byte EvKillFeed = 42;
+
     public static ScoreBoard instance;
 
     const string BlueKey = GameProps.BlueScore;
@@ -31,8 +39,6 @@ public class ScoreBoard : MonoBehaviourPunCallbacks
     [Tooltip("Seconds the VICTORY/DEFEAT banner shows before the Results scene loads.")]
     [SerializeField] float endBannerTime = 4f;
 
-    private PhotonView view;
-
     // Master-only authoritative counters. Properties echo back asynchronously, so the
     // master must not re-read them between increments (a stale echo would lose a kill).
     bool masterCountsReady;
@@ -45,7 +51,6 @@ public class ScoreBoard : MonoBehaviourPunCallbacks
 
     void Awake()
     {
-        view = GetComponent<PhotonView>();
         instance = this;
     }
 
@@ -69,6 +74,9 @@ public class ScoreBoard : MonoBehaviourPunCallbacks
             });
             foreach (Player p in PhotonNetwork.PlayerList)
                 p.SetCustomProperties(new Hashtable { { GameProps.Kills, 0 }, { GameProps.Deaths, 0 } });
+            // Safety net: anyone who reached the match without a team gets one now. Without a
+            // team nobody could damage them and their kills/deaths would not count.
+            PlayerTeams.AssignMissingTeams();
 
             blueTeamScore = redTeamScore = 0;
             masterBlue = masterRed = 0;
@@ -88,21 +96,36 @@ public class ScoreBoard : MonoBehaviourPunCallbacks
     /// <summary>Called by the dying (local) player. killerActor = -1 for environment deaths.</summary>
     public void ReportDeath(int victimTeam, int victimActor, int killerActor)
     {
-        if (victimTeam != 1 && victimTeam != 2)
+        // Always report: kills/deaths count even if the team is unknown (only the team score needs it).
+        if (!PhotonNetwork.InRoom)
             return;
-        view.RPC(nameof(RPC_ReportDeath), RpcTarget.MasterClient, victimTeam, victimActor, killerActor);
+        PhotonNetwork.RaiseEvent(EvReportDeath, new object[] { victimTeam, victimActor, killerActor },
+            new RaiseEventOptions { Receivers = ReceiverGroup.MasterClient }, SendOptions.SendReliable);
     }
 
     // Kept for callers using the old API.
     public void PlayerDied(int playerTeam) => ReportDeath(playerTeam, PhotonNetwork.LocalPlayer.ActorNumber, -1);
 
-    [PunRPC]
-    void RPC_ReportDeath(int deadPlayerTeam, int victimActor, int killerActor, PhotonMessageInfo info)
+    /// <summary>Photon events for this class (registered automatically by MonoBehaviourPunCallbacks).</summary>
+    public void OnEvent(EventData photonEvent)
+    {
+        if (photonEvent.Code != EvReportDeath && photonEvent.Code != EvKillFeed)
+            return;
+        if (!(photonEvent.CustomData is object[] data))
+            return;
+
+        if (photonEvent.Code == EvReportDeath && data.Length >= 3)
+            HandleReportDeath((int)data[0], (int)data[1], (int)data[2], photonEvent.Sender);
+        else if (photonEvent.Code == EvKillFeed && data.Length >= 4)
+            HandleKillFeed((int)data[0], (int)data[1], (int)data[2], (int)data[3]);
+    }
+
+    void HandleReportDeath(int deadPlayerTeam, int victimActor, int killerActor, int senderActor)
     {
         if (!PhotonNetwork.IsMasterClient || PhotonNetwork.CurrentRoom == null || MatchState.IsOver)
             return;
         // Only the victim may report its own death.
-        if (info.Sender != null && info.Sender.ActorNumber != victimActor)
+        if (senderActor > 0 && senderActor != victimActor)
             return;
 
         if (!masterCountsReady)
@@ -113,9 +136,15 @@ public class ScoreBoard : MonoBehaviourPunCallbacks
             masterCountsReady = true;
         }
 
+        // The master knows the teams best: prefer its view over what the victim sent.
+        Player victimPlayer = PhotonNetwork.CurrentRoom.GetPlayer(victimActor);
+        int knownTeam = victimPlayer != null ? PlayerTeams.GetTeam(victimPlayer) : 0;
+        if (knownTeam != 0)
+            deadPlayerTeam = knownTeam;
+
         // Team score: any death of a team member scores for the other team (falls included).
-        if (deadPlayerTeam == 2) masterBlue++;
-        else if (deadPlayerTeam == 1) masterRed++;
+        if (deadPlayerTeam == Teams.Red) masterBlue++;
+        else if (deadPlayerTeam == Teams.Blue) masterRed++;
 
         PhotonNetwork.CurrentRoom.SetCustomProperties(new Hashtable { { BlueKey, masterBlue }, { RedKey, masterRed } });
         blueTeamScore = masterBlue;
@@ -132,7 +161,8 @@ public class ScoreBoard : MonoBehaviourPunCallbacks
             killer.SetCustomProperties(new Hashtable { { GameProps.Kills, Increment(masterKills, killer, GameProps.Kills) } });
 
         int killerTeam = killer != null ? PlayerTeams.GetTeam(killer) : 0;
-        view.RPC(nameof(RPC_KillFeed), RpcTarget.All, killer != null ? killerActor : -1, victimActor, killerTeam, deadPlayerTeam);
+        PhotonNetwork.RaiseEvent(EvKillFeed, new object[] { killer != null ? killerActor : -1, victimActor, killerTeam, deadPlayerTeam },
+            new RaiseEventOptions { Receivers = ReceiverGroup.All }, SendOptions.SendReliable);
 
         if (scoreLimit > 0 && (masterBlue >= scoreLimit || masterRed >= scoreLimit))
             EndMatch(GameProps.EndReasonScore);
@@ -147,8 +177,7 @@ public class ScoreBoard : MonoBehaviourPunCallbacks
         return value;
     }
 
-    [PunRPC]
-    void RPC_KillFeed(int killerActor, int victimActor, int killerTeam, int victimTeam)
+    void HandleKillFeed(int killerActor, int victimActor, int killerTeam, int victimTeam)
     {
         MatchEvents.RaiseKill(new KillInfo
         {

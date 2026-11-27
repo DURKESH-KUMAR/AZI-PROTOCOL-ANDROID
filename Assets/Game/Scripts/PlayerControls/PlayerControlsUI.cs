@@ -284,6 +284,6 @@ public class PlayerControlsUI : MonoBehaviour
             best = h.distance;
             target = h.collider.GetComponentInParent<PlayerMovement>();
         }
-        return target != null && !target.IsDead && target.playerTeam != movement.playerTeam;
+        return target != null && !target.IsDead && (movement.playerTeam == 0 || target.playerTeam != movement.playerTeam);
     }
 }

@@ -50,6 +50,13 @@ public class PlayerManager : MonoBehaviour
     {
         if (!view.IsMine || playerMovement.IsDead)
             return;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        // Test keys (never in release builds): F1 = take 50 damage, F2 = die -> watch the respawn.
+        if (Input.GetKeyDown(KeyCode.F1))
+            playerMovement.DebugTakeDamage(50f);
+        if (Input.GetKeyDown(KeyCode.F2))
+            playerMovement.DebugTakeDamage(10000f);
+#endif
         if (InputBlocked)
         {
             inputManager.ClearInputs();

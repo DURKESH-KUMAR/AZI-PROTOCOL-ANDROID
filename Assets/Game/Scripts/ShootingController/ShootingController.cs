@@ -187,7 +187,7 @@ public class ShootingController : MonoBehaviour
 
             // Collider may be on a child bone/mesh, so search upwards.
             PlayerMovement target = hit.collider.GetComponentInParent<PlayerMovement>();
-            if (target != null && target != playerMovement && !target.IsDead && target.playerTeam != playerTeam)
+            if (target != null && target != playerMovement && !target.IsDead && (playerTeam == 0 || target.playerTeam != playerTeam))
             {
                 if (!target.IsSpawnProtected)
                 {

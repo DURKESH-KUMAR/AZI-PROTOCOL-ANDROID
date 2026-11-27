@@ -32,6 +32,7 @@ public class ResultsScreen : MonoBehaviourPunCallbacks
 
         result = MatchResults.Pending ?? MatchResults.Capture(leftEarly: false);
         MatchResults.Pending = null;
+        PlaceUnassignedPlayers(result);
 
         if (PhotonNetwork.InRoom)
         {
@@ -126,6 +127,31 @@ public class ResultsScreen : MonoBehaviourPunCallbacks
         root.Q<Label>(prefix + "-label").text = Teams.Name(team) + (winner == team ? "  WINS" : "");
         root.Q<Label>(prefix + "-value").style.color = c;
         root.Q(prefix + "-score").EnableInClassList("score--lost", winner != 0 && winner != team);
+    }
+
+    /// <summary>
+    /// Every player (and their kills) must appear: anyone without a team is listed in the
+    /// smaller roster instead of being dropped.
+    /// </summary>
+    static void PlaceUnassignedPlayers(MatchResult r)
+    {
+        if (r == null)
+            return;
+        int blue = 0, red = 0;
+        foreach (MatchResult.Entry e in r.players)
+        {
+            if (e.team == Teams.Blue) blue++;
+            else if (e.team == Teams.Red) red++;
+        }
+        for (int i = 0; i < r.players.Count; i++)
+        {
+            MatchResult.Entry e = r.players[i];
+            if (e.team == Teams.Blue || e.team == Teams.Red)
+                continue;
+            e.team = blue <= red ? Teams.Blue : Teams.Red;
+            if (e.team == Teams.Blue) blue++; else red++;
+            r.players[i] = e;
+        }
     }
 
     void Roster(VisualElement panel, int team, int mvpActor)

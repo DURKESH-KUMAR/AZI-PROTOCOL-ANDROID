@@ -69,6 +69,11 @@ public class PlayerControllerManager : MonoBehaviour
             // Should not happen (master assigns in the lobby), but never leave a player unspawned.
             playerTeam = PhotonNetwork.LocalPlayer.ActorNumber % 2 == 1 ? Teams.Blue : Teams.Red;
             Debug.LogWarning("No team property found, falling back to team " + playerTeam);
+            // Publish it: everyone (damage checks, scoreboard, results) must see the same team.
+            // CAS on "no team yet" so a team the master assigns at the same moment wins.
+            PhotonNetwork.LocalPlayer.SetCustomProperties(
+                new ExitGames.Client.Photon.Hashtable { { PlayerTeams.TeamKey, playerTeam } },
+                new ExitGames.Client.Photon.Hashtable { { PlayerTeams.TeamKey, null } });
         }
         SpawnInTeamArea(playerTeam);
     }
