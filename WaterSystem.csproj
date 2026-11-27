@@ -50,14 +50,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Viking Village\Boat Attack Water System\Scripts\MainCameraAlign.cs" />
-    <Compile Include="Assets\Viking Village\Boat Attack Water System\Scripts\Data\WaterSurfaceData.cs" />
     <Compile Include="Assets\Viking Village\Boat Attack Water System\Scripts\Data\WaterSettingsData.cs" />
-    <Compile Include="Assets\Viking Village\Boat Attack Water System\Scripts\LocalToWorldJob.cs" />
-    <Compile Include="Assets\Viking Village\Boat Attack Water System\Scripts\Water.cs" />
-    <Compile Include="Assets\Viking Village\Boat Attack Water System\Scripts\GerstnerWavesJobs.cs" />
     <Compile Include="Assets\Viking Village\Boat Attack Water System\Scripts\Rendering\WaterSystemFeature.cs" />
     <Compile Include="Assets\Viking Village\Boat Attack Water System\Scripts\Data\WaterResources.cs" />
     <Compile Include="Assets\Viking Village\Boat Attack Water System\Scripts\Rendering\PlanarReflections.cs" />
+    <Compile Include="Assets\Viking Village\Boat Attack Water System\Scripts\Data\WaterSurfaceData.cs" />
+    <Compile Include="Assets\Viking Village\Boat Attack Water System\Scripts\LocalToWorldJob.cs" />
+    <Compile Include="Assets\Viking Village\Boat Attack Water System\Scripts\Water.cs" />
+    <Compile Include="Assets\Viking Village\Boat Attack Water System\Scripts\GerstnerWavesJobs.cs" />
     <Compile Include="Assets\Viking Village\Boat Attack Water System\Scripts\BuoyantObject.cs" />
   </ItemGroup>
   <ItemGroup>

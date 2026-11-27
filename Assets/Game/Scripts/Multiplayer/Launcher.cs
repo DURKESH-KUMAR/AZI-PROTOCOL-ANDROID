@@ -178,12 +178,15 @@ public class Launcher : MonoBehaviourPunCallbacks
     {
         string region = GameSettings.Region;
         Debug.Log("Connecting to master (" + GameSettings.RegionLabel(region) + ")....");
-        // ConnectToRegion leaves PhotonServerSettings untouched (editing it at runtime would
-        // permanently change the asset in the editor).
-        if (string.IsNullOrEmpty(region))
-            PhotonNetwork.ConnectUsingSettings();
-        else
-            PhotonNetwork.ConnectToRegion(region);
+
+        // Always ConnectUsingSettings: it loads the App ID, AuthMode and protocol.
+        // (PhotonNetwork.ConnectToRegion does NOT - with only that call Photon received an
+        // empty App ID and answered "Invalid application id" (32767).)
+        // The region goes into a COPY of the settings, so the PhotonServerSettings asset is
+        // never modified at runtime (that would permanently change it in the editor).
+        Photon.Realtime.AppSettings settings = PhotonNetwork.PhotonServerSettings.AppSettings.CopyTo(new Photon.Realtime.AppSettings());
+        settings.FixedRegion = string.IsNullOrEmpty(region) ? null : region;
+        PhotonNetwork.ConnectUsingSettings(settings);
     }
 
     /// <summary>Called by the settings screen after the region changed.</summary>
@@ -263,7 +266,13 @@ public class Launcher : MonoBehaviourPunCallbacks
             Connect(); // retry straight away without custom auth (see photonAuthNotConfigured)
             return;
         }
-        if (cause == DisconnectCause.CustomAuthenticationFailed || cause == DisconnectCause.InvalidAuthentication)
+        if (cause == DisconnectCause.InvalidAuthentication)
+        {
+            // Photon reports a wrong/unknown App ID this way (ReturnCode 32767), not a player problem.
+            FailAuth("Photon does not recognise this game's App ID.\n(Check PhotonServerSettings > App Id PUN against the Photon dashboard.)");
+            return;
+        }
+        if (cause == DisconnectCause.CustomAuthenticationFailed)
         {
             FailAuth("The game server did not accept this account" + (string.IsNullOrEmpty(authRejection) ? "." : ": " + authRejection));
             return;

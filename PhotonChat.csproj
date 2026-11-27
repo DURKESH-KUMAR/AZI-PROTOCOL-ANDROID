@@ -49,18 +49,18 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.3.18f1\Editor\Data\Tools\BuildPipeline\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Photon\PhotonChat\Code\ChannelWellKnownProperties.cs" />
     <Compile Include="Assets\Photon\PhotonChat\Code\ChatState.cs" />
+    <Compile Include="Assets\Photon\PhotonChat\Code\ChatPeer.cs" />
+    <Compile Include="Assets\Photon\PhotonChat\Code\ChatParameterCode.cs" />
+    <Compile Include="Assets\Photon\PhotonChat\Code\IChatClientListener.cs" />
+    <Compile Include="Assets\Photon\PhotonChat\Code\ChannelWellKnownProperties.cs" />
     <Compile Include="Assets\Photon\PhotonChat\Code\ChatClient.cs" />
     <Compile Include="Assets\Photon\PhotonChat\Code\ChatUserStatus.cs" />
-    <Compile Include="Assets\Photon\PhotonChat\Code\ChatPeer.cs" />
     <Compile Include="Assets\Photon\PhotonChat\Code\ChannelCreationOptions.cs" />
     <Compile Include="Assets\Photon\PhotonChat\Code\ChatOperationCode.cs" />
     <Compile Include="Assets\Photon\PhotonChat\Code\ChatEventCode.cs" />
     <Compile Include="Assets\Photon\PhotonChat\Code\ChatDisconnectCause.cs" />
-    <Compile Include="Assets\Photon\PhotonChat\Code\ChatParameterCode.cs" />
     <Compile Include="Assets\Photon\PhotonChat\Code\ChatChannel.cs" />
-    <Compile Include="Assets\Photon\PhotonChat\Code\IChatClientListener.cs" />
     <Compile Include="Assets\Photon\PhotonChat\Code\ChatAppSettings.cs" />
   </ItemGroup>
   <ItemGroup>

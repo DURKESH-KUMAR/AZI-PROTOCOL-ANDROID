@@ -49,11 +49,11 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.3.18f1\Editor\Data\Tools\BuildPipeline\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Viking Village\Boat Attack Water System\Editor\WaterSurfaceDataEditor.cs" />
     <Compile Include="Assets\Viking Village\Boat Attack Water System\Editor\WaterSettingsDataEditor.cs" />
     <Compile Include="Assets\Viking Village\Boat Attack Water System\Editor\PlanarSettingsDrawer.cs" />
     <Compile Include="Assets\Viking Village\Boat Attack Water System\Editor\WaterEditor.cs" />
     <Compile Include="Assets\Viking Village\Boat Attack Water System\Editor\BuoyantObjectEditor.cs" />
+    <Compile Include="Assets\Viking Village\Boat Attack Water System\Editor\WaterSurfaceDataEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Viking Village\Boat Attack Water System\Editor\WaterSystem.editor.asmdef" />
