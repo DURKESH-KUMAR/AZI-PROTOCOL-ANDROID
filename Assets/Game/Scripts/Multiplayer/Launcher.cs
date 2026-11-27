@@ -23,6 +23,9 @@ public class Launcher : MonoBehaviourPunCallbacks
     [SerializeField] bool allowSoloInEditor = true;
     [Tooltip("Seconds before retrying after an unexpected disconnect in the menu.")]
     [SerializeField] float reconnectDelay = 3f;
+    [Tooltip("Sign in with Unity Authentication and send the token to Photon on every connect.\n" +
+             "Keep ON: with 'allow anonymous clients' disabled in the Photon dashboard, clients without a valid token are rejected.")]
+    [SerializeField] bool requireAuthentication = true;
 
     public GameObject startButton;
 
@@ -103,14 +106,76 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     // ===================================================================== CONNECTION
 
+    bool connecting;
+    int authFailures;
+    string authRejection = "";
+
+    /// <summary>
+    /// The Photon app has no authentication provider configured yet (dashboard setup pending).
+    /// Photon then accepts every client anyway, so sending a token only causes a rejection:
+    /// connect without custom auth for this session. Once the dashboard is configured Photon
+    /// never reports this again and every player must sign in.
+    /// </summary>
+    static bool photonAuthNotConfigured;
+
     void Connect()
     {
         CancelInvoke(nameof(Connect));
-        if (PhotonNetwork.IsConnected)
+        if (PhotonNetwork.IsConnected || connecting)
             return;
         if (MenuManager.instance != null)
             MenuManager.instance.OpenMenu("LoadingMenu");
+        ConnectAuthenticated();
+    }
 
+    /// <summary>Unity Authentication sign-in -> Photon AuthValues -> connect.</summary>
+    async void ConnectAuthenticated()
+    {
+        connecting = true;
+        try
+        {
+            if (requireAuthentication && photonAuthNotConfigured)
+            {
+                // Keep the stable Unity player id as the Photon UserId even without custom auth.
+                PhotonNetwork.AuthValues = new AuthenticationValues(
+                    string.IsNullOrEmpty(PhantomWarrior.Auth.PlayerAccount.PlayerId) ? null : PhantomWarrior.Auth.PlayerAccount.PlayerId);
+            }
+            else if (requireAuthentication)
+            {
+                if (!PhotonAuth.Enabled)
+                {
+                    FailAuth("Unity Authentication is not installed (com.unity.services.authentication).");
+                    return;
+                }
+                if (!await PhotonAuth.PrepareAsync())
+                {
+                    FailAuth(PhotonAuth.LastError);
+                    return;
+                }
+                if (this == null || PhotonNetwork.IsConnected)
+                    return; // menu closed or already connected while signing in
+            }
+            ConnectPhoton();
+        }
+        finally
+        {
+            connecting = false;
+        }
+    }
+
+    /// <summary>Sign-in problem: show it and retry with a growing delay (3s, 6s, 12s ... 60s).</summary>
+    void FailAuth(string message)
+    {
+        if (this == null)
+            return;
+        authFailures++;
+        float delay = Mathf.Min(60f, reconnectDelay * Mathf.Pow(2f, authFailures - 1));
+        ShowError("Could not sign in.\n" + message + "\nRetrying in " + Mathf.CeilToInt(delay) + "s...");
+        Invoke(nameof(Connect), delay);
+    }
+
+    void ConnectPhoton()
+    {
         string region = GameSettings.Region;
         Debug.Log("Connecting to master (" + GameSettings.RegionLabel(region) + ")....");
         // ConnectToRegion leaves PhotonServerSettings untouched (editing it at runtime would
@@ -138,8 +203,28 @@ public class Launcher : MonoBehaviourPunCallbacks
         PhotonNetwork.Disconnect(); // OnDisconnected reconnects with the new region
     }
 
+    /// <summary>Photon's auth service (the photon-auth worker) rejected the token.</summary>
+    public override void OnCustomAuthenticationFailed(string debugMessage)
+    {
+        if (debugMessage != null && debugMessage.Contains("none configured"))
+        {
+            // Not a rejection of the player: the Photon app simply has no auth set up yet.
+            photonAuthNotConfigured = true;
+            authRejection = "";
+            Debug.LogWarning("[Launcher] Photon authentication is NOT configured for this App ID, so anyone with the App ID can connect. " +
+                             "Connecting without custom auth for now. Before release: deploy Server/photon-auth-worker and add it as " +
+                             "a Custom Server in the Photon dashboard (Manage > Authentication), with anonymous clients disabled.");
+            return;
+        }
+        authRejection = debugMessage;
+        PhotonAuth.OnRejected(); // fetch a fresh token on the next attempt
+        Debug.LogWarning("Photon authentication rejected: " + debugMessage);
+    }
+
     public override void OnConnectedToMaster()
     {
+        authFailures = 0;
+        authRejection = "";
         Debug.Log("Connected to master (" + PhotonNetwork.CloudRegion + ")");
         PhotonNetwork.AutomaticallySyncScene = true;
         if (!PhotonNetwork.InLobby)
@@ -173,6 +258,16 @@ public class Launcher : MonoBehaviourPunCallbacks
         if (cause == DisconnectCause.DisconnectByClientLogic || cause == DisconnectCause.ApplicationQuit)
             return;
 
+        if (cause == DisconnectCause.CustomAuthenticationFailed && photonAuthNotConfigured && string.IsNullOrEmpty(authRejection))
+        {
+            Connect(); // retry straight away without custom auth (see photonAuthNotConfigured)
+            return;
+        }
+        if (cause == DisconnectCause.CustomAuthenticationFailed || cause == DisconnectCause.InvalidAuthentication)
+        {
+            FailAuth("The game server did not accept this account" + (string.IsNullOrEmpty(authRejection) ? "." : ": " + authRejection));
+            return;
+        }
         ShowError("Disconnected: " + cause + "\nRetrying...");
         // Mobile networks drop often: retry automatically instead of leaving the player stuck.
         Invoke(nameof(Connect), reconnectDelay);

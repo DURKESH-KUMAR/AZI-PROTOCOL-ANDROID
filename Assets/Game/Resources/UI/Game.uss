@@ -8,6 +8,8 @@
 /* Chernobyl stencil font for ALL text: labels, buttons, text fields, toggles. */
 .unity-text-element {
     -unity-font: url("/Assets/Font/Chernobyl.otf");
+    /* The default runtime theme sets a font DEFINITION, which takes precedence over -unity-font. */
+    -unity-font-definition: url("/Assets/Font/Chernobyl.otf");
     -unity-font-style: normal; /* the font is already heavy; synthetic bold blurs it */
 }
 

@@ -1,0 +1,23 @@
+{
+    "name": "PhantomWarrior.Auth",
+    "rootNamespace": "PhantomWarrior.Auth",
+    "references": [
+        "Unity.Services.Core",
+        "Unity.Services.Authentication"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.services.authentication",
+            "expression": "3.0.0",
+            "define": "PW_UGS_AUTH"
+        }
+    ],
+    "noEngineReferences": false
+}

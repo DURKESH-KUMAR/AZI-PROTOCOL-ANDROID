@@ -1,0 +1,15 @@
+name = "phantom-warrior-photon-auth"
+main = "src/index.js"
+compatibility_date = "2025-11-01"
+
+[vars]
+# Your Unity Cloud project ID (Unity Cloud Dashboard > Project settings, or
+# Unity Editor > Project Settings > Services). Tokens from any other project are rejected.
+UNITY_PROJECT_ID = "2efb48d4-f427-4f55-849e-5433dbf84f91"
+
+# Optional: comma-separated Unity player IDs that may not connect.
+BANNED_PLAYER_IDS = ""
+
+# Optional hardening (recommended): a random value that only Photon knows.
+#   npx wrangler secret put PHOTON_SHARED_SECRET
+# then add the same value in the Photon dashboard as a custom-auth key/value pair: secret = <value>
